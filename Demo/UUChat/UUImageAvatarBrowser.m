@@ -1,16 +1,16 @@
 //
-//  SJAvatarBrowser.m
-//  zhitu
+//  UUAVAudioPlayer.m
+//  BloodSugarForDoc
 //
-//  Created by 陈少杰 on 13-11-1.
-//  Copyright (c) 2013年 聆创科技有限公司. All rights reserved.
+//  Created by shake on 14-9-1.
+//  Copyright (c) 2014年 shake. All rights reserved.
 //
 
-#import "SJAvatarBrowser.h"
+#import "UUImageAvatarBrowser.h"
 
 static UIImageView *orginImageView;
 static CGRect oldframe;
-@implementation SJAvatarBrowser
+@implementation UUImageAvatarBrowser
 
 +(void)showImage:(UIImageView *)avatarImageView{
     UIImage *image=avatarImageView.image;

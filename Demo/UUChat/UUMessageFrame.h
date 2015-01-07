@@ -32,11 +32,9 @@
 @property (nonatomic, assign, readonly) CGRect iconF;
 @property (nonatomic, assign, readonly) CGRect timeF;
 @property (nonatomic, assign, readonly) CGRect contentF;
-@property (nonatomic, assign, readonly) CGRect lineF;
 
 @property (nonatomic, assign, readonly) CGFloat cellHeight;
 @property (nonatomic, strong) UUMessage *message;
 @property (nonatomic, assign) BOOL showTime;
-@property (nonatomic, assign) BOOL showLine;
 
 @end

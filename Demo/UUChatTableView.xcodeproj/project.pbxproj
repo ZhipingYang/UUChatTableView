@@ -54,7 +54,7 @@
 		B7B905D11A5B810400A46EFD /* MJRefreshConst.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905CA1A5B810400A46EFD /* MJRefreshConst.m */; };
 		B7B905D21A5B810400A46EFD /* MJRefreshFooterView.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905CC1A5B810400A46EFD /* MJRefreshFooterView.m */; };
 		B7B905D31A5B810400A46EFD /* MJRefreshHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905CE1A5B810400A46EFD /* MJRefreshHeaderView.m */; };
-		B7B905E51A5BCFD700A46EFD /* SJAvatarBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905D61A5BCFD700A46EFD /* SJAvatarBrowser.m */; };
+		B7B905E51A5BCFD700A46EFD /* UUImageAvatarBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905D61A5BCFD700A46EFD /* UUImageAvatarBrowser.m */; };
 		B7B905E61A5BCFD700A46EFD /* UUAVAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905D81A5BCFD700A46EFD /* UUAVAudioPlayer.m */; };
 		B7B905E71A5BCFD700A46EFD /* UUInputFunctionView.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905DA1A5BCFD700A46EFD /* UUInputFunctionView.m */; };
 		B7B905E81A5BCFD700A46EFD /* UUMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905DC1A5BCFD700A46EFD /* UUMessage.m */; };
@@ -63,6 +63,7 @@
 		B7B905EB1A5BCFD700A46EFD /* UUMessageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905E21A5BCFD700A46EFD /* UUMessageFrame.m */; };
 		B7B905EC1A5BCFD700A46EFD /* UUProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905E41A5BCFD700A46EFD /* UUProgressHUD.m */; };
 		B7B905EF1A5BD04700A46EFD /* ChatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905EE1A5BD04700A46EFD /* ChatModel.m */; };
+		B7B905F11A5BDBFE00A46EFD /* haha.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = B7B905F01A5BDBFE00A46EFD /* haha.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,8 +159,8 @@
 		B7B905CC1A5B810400A46EFD /* MJRefreshFooterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJRefreshFooterView.m; sourceTree = "<group>"; };
 		B7B905CD1A5B810400A46EFD /* MJRefreshHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJRefreshHeaderView.h; sourceTree = "<group>"; };
 		B7B905CE1A5B810400A46EFD /* MJRefreshHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJRefreshHeaderView.m; sourceTree = "<group>"; };
-		B7B905D51A5BCFD700A46EFD /* SJAvatarBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJAvatarBrowser.h; sourceTree = "<group>"; };
-		B7B905D61A5BCFD700A46EFD /* SJAvatarBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJAvatarBrowser.m; sourceTree = "<group>"; };
+		B7B905D51A5BCFD700A46EFD /* UUImageAvatarBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUImageAvatarBrowser.h; sourceTree = "<group>"; };
+		B7B905D61A5BCFD700A46EFD /* UUImageAvatarBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUImageAvatarBrowser.m; sourceTree = "<group>"; };
 		B7B905D71A5BCFD700A46EFD /* UUAVAudioPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUAVAudioPlayer.h; sourceTree = "<group>"; };
 		B7B905D81A5BCFD700A46EFD /* UUAVAudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUAVAudioPlayer.m; sourceTree = "<group>"; };
 		B7B905D91A5BCFD700A46EFD /* UUInputFunctionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUInputFunctionView.h; sourceTree = "<group>"; };
@@ -176,6 +177,7 @@
 		B7B905E41A5BCFD700A46EFD /* UUProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUProgressHUD.m; sourceTree = "<group>"; };
 		B7B905ED1A5BD04700A46EFD /* ChatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatModel.h; sourceTree = "<group>"; };
 		B7B905EE1A5BD04700A46EFD /* ChatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatModel.m; sourceTree = "<group>"; };
+		B7B905F01A5BDBFE00A46EFD /* haha.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = haha.jpeg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -290,6 +292,7 @@
 		B7B905671A5B7F8200A46EFD /* pic */ = {
 			isa = PBXGroup;
 			children = (
+				B7B905F01A5BDBFE00A46EFD /* haha.jpeg */,
 				B7B905681A5B7F8B00A46EFD /* chat_animation_white1.png */,
 				B7B905691A5B7F8B00A46EFD /* chat_animation_white2.png */,
 				B7B9056A1A5B7F8B00A46EFD /* chat_animation_white3.png */,
@@ -379,8 +382,8 @@
 		B7B905D41A5BCFD700A46EFD /* UUChat */ = {
 			isa = PBXGroup;
 			children = (
-				B7B905D51A5BCFD700A46EFD /* SJAvatarBrowser.h */,
-				B7B905D61A5BCFD700A46EFD /* SJAvatarBrowser.m */,
+				B7B905D51A5BCFD700A46EFD /* UUImageAvatarBrowser.h */,
+				B7B905D61A5BCFD700A46EFD /* UUImageAvatarBrowser.m */,
 				B7B905D71A5BCFD700A46EFD /* UUAVAudioPlayer.h */,
 				B7B905D81A5BCFD700A46EFD /* UUAVAudioPlayer.m */,
 				B7B905D91A5BCFD700A46EFD /* UUInputFunctionView.h */,
@@ -498,6 +501,7 @@
 				B7B905831A5B7F8B00A46EFD /* chatfrom_bg_normal.png in Resources */,
 				B7B9057D1A5B7F8B00A46EFD /* chat_ipunt_message.png in Resources */,
 				B7B9057B1A5B7F8B00A46EFD /* chat_animation2.png in Resources */,
+				B7B905F11A5BDBFE00A46EFD /* haha.jpeg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -528,7 +532,7 @@
 				B7B905B41A5B7F9F00A46EFD /* AFURLSessionManager.m in Sources */,
 				B7B905E61A5BCFD700A46EFD /* UUAVAudioPlayer.m in Sources */,
 				B7B905AE1A5B7F9F00A46EFD /* AFHTTPSessionManager.m in Sources */,
-				B7B905E51A5BCFD700A46EFD /* SJAvatarBrowser.m in Sources */,
+				B7B905E51A5BCFD700A46EFD /* UUImageAvatarBrowser.m in Sources */,
 				B7B905C01A5B7FCB00A46EFD /* NSDate+Utils.m in Sources */,
 				B7B905661A5B7F6D00A46EFD /* Mp3Recorder.m in Sources */,
 				B7B905EB1A5BCFD700A46EFD /* UUMessageFrame.m in Sources */,

@@ -10,9 +10,11 @@
 
 
 @protocol UUAVAudioPlayerDelegate <NSObject>
+
 - (void)UUAVAudioPlayerBeiginLoadVoice;
 - (void)UUAVAudioPlayerBeiginPlay;
 - (void)UUAVAudioPlayerDidFinishPlay;
+
 @end
 
 @interface UUAVAudioPlayer : NSObject

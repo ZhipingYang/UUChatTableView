@@ -12,7 +12,7 @@
 #import "UUAVAudioPlayer.h"
 #import "UIImageView+AFNetworking.h"
 #import "UIButton+AFNetworking.h"
-#import "SJAvatarBrowser.h"
+#import "UUImageAvatarBrowser.h"
 
 @interface UUMessageCell ()<UUAVAudioPlayerDelegate>
 {
@@ -69,11 +69,6 @@
         [self.btnContent addTarget:self action:@selector(btnContentClick)  forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:self.btnContent];
         
-        // 5.创建line细线
-        self.lineView = [[UIImageView alloc]initWithFrame:CGRectZero];
-        self.lineView.image = [UIImage imageNamed:@"chat_fiveChatLimit"];
-        [self.contentView addSubview:self.lineView];
-        
         fiveMessageRemind = [[UILabel alloc]init];
         fiveMessageRemind.textColor = [UIColor lightGrayColor];
         fiveMessageRemind.textAlignment = NSTextAlignmentCenter;
@@ -106,7 +101,7 @@
     else if (self.messageFrame.message.type == UUMessageTypePicture)
     {
         if (self.btnContent.backImageView) {
-            [SJAvatarBrowser showImage:self.btnContent.backImageView];
+            [UUImageAvatarBrowser showImage:self.btnContent.backImageView];
         }
 #warning 注意添加该功能时设置的代理要为Controller(一般都是Controller)，否则不要下面的功能
         [[(UIViewController *)self.delegate view] endEditing:YES];
@@ -160,14 +155,11 @@
     self.labelNum.text = message.strName;
     if (messageFrame.idF.origin.x > 160) {
         self.labelNum.frame = CGRectMake(messageFrame.idF.origin.x - 50, messageFrame.idF.origin.y + 3, 100, messageFrame.idF.size.height);
-        self.labelNum.textAlignment = UITextAlignmentRight;
+        self.labelNum.textAlignment = NSTextAlignmentRight;
     }else{
         self.labelNum.frame = CGRectMake(messageFrame.idF.origin.x, messageFrame.idF.origin.y + 3, 80, messageFrame.idF.size.height);
-        self.labelNum.textAlignment = UITextAlignmentLeft;
+        self.labelNum.textAlignment = NSTextAlignmentLeft;
     }
-    
-    self.lineView.frame = messageFrame.lineF;
-    
 
     // 4、设置内容
     
