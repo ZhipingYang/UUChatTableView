@@ -14,20 +14,17 @@
 #import "UUMessageFrame.h"
 #import "UUMessage.h"
 
-@interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate>
+@interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 {
-    NSMutableArray *allMessagesFrame;
-    NSArray *headInfoArray;
-    
-    BOOL isMoreData;
-    
-    MJRefreshHeaderView *tableViewHeader;
-    MJRefreshFooterView *tableViewFooter;
 }
+
+@property (strong, nonatomic) MJRefreshHeaderView *head;
+@property (strong, nonatomic) MJRefreshFooterView *foot;
 
 @property (strong, nonatomic) ChatModel *chatModel;
 
 @property (weak, nonatomic) IBOutlet UITableView *chatTableView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
 
 @end
 
@@ -36,32 +33,126 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self addRefreshViews];
     [self loadBaseViewsAndData];
+}
+
+- (void)addRefreshViews
+{
+    __weak typeof(self) weakSelf = self;
+    
+    //load more
+    int pageNum = 3;
+    
+    _head = [MJRefreshHeaderView header];
+    _head.scrollView = self.chatTableView;
+    _head.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
+        [weakSelf.chatModel addRandomItemsToDataSource:pageNum];
+        if (weakSelf.chatModel.dataSource.count>pageNum) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [weakSelf.chatTableView reloadData];
+
+                [weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            });
+        }
+        [weakSelf.head endRefreshing];
+    };
+    
+//     //refresh
+//    _foot = [MJRefreshFooterView footer];
+//    _foot.scrollView = self.chatTableView;
+//    _foot.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
+//        [weakSelf.chatModel populateRandomDataSource];
+//        [weakSelf.chatTableView reloadData];
+//        [weakSelf.foot endRefreshing];
+//    };
+
 }
 
 - (void)loadBaseViewsAndData
 {
     self.chatModel = [[ChatModel alloc]init];
-    [self.chatModel populateDataSource];
+    [self.chatModel populateRandomDataSource];
     
     UUInputFunctionView *IFView = [[UUInputFunctionView alloc]initWithSuperVC:self];
     IFView.delegate = self;
     [self.view addSubview:IFView];
     
+    [self.chatTableView reloadData];
+    
+    //添加通知
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
     
 }
+
+//跟随键盘高度变化
+-(void)keyboardShow:(NSNotification *)notification
+{
+    NSDictionary *userInfo = [notification userInfo];
+    NSTimeInterval animationDuration;
+    UIViewAnimationCurve animationCurve;
+    CGRect keyboardEndFrame;
+    
+    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
+    
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    [UIView setAnimationCurve:animationCurve];
+    
+    if (notification.name == UIKeyboardWillShowNotification) {
+        self.bottomConstraint.constant = keyboardEndFrame.size.height+40;
+    }else{
+        self.bottomConstraint.constant = 40;
+    }
+
+    [self.view layoutIfNeeded];
+    
+    [UIView commitAnimations];
+    
+}
+
+//滑到底部动画
+- (void)tableViewScrollToBottom
+{
+    if (self.chatModel.dataSource.count==0)
+        return;
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.chatModel.dataSource.count-1 inSection:0];
+    [self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+
 #pragma mark - InputFunctionViewDelegate
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message
 {
-    
+    NSDictionary *dic = @{@"strContent": message, @"type":@0};
+    funcView.TextViewInput.text = @"";
+    [funcView changeSendBtnWithPhoto:YES];
+    [self dealTheFunctionData:dic];
 }
+
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image
 {
-    
+    NSDictionary *dic = @{@"picture": image, @"type":@1};
+    [self dealTheFunctionData:dic];
 }
+
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second
 {
-    
+    NSDictionary *dic = @{@"voice": voice, @"strVoiceTime":[NSString stringWithFormat:@"%d",(int)second], @"type":@2};
+    [self dealTheFunctionData:dic];
+}
+
+- (void)dealTheFunctionData:(NSDictionary *)dic
+{
+    [self.chatModel addSpecifiedItem:dic];
+    [self.chatTableView reloadData];
+    [self tableViewScrollToBottom];
 }
 
 #pragma mark - tableView_delegate_datasource
@@ -78,30 +169,29 @@
         cell.delegate = self;
     }
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    [cell setMessageFrame:allMessagesFrame[indexPath.row]];
-    
+    [cell setMessageFrame:self.chatModel.dataSource[indexPath.row]];
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return [allMessagesFrame[indexPath.row] cellHeight];
+    return [self.chatModel.dataSource[indexPath.row] cellHeight];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [self.view endEditing:YES];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
     [self.view endEditing:YES];
 }
 
 #pragma mark - cellDelegate
-//- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId
-//{
-//    PatientsInfoViewController *info = [[PatientsInfoViewController alloc]init];
-//    info.patinetsID = userId;
-//    [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
-//    [self.navigationController pushViewController:info animated:YES];
-//}
-
-
+- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId
+{
+    // headIamgeIcon is clicked
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"" message:@"click !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
+    [alert show];
+}
 
 
 - (void)didReceiveMemoryWarning {

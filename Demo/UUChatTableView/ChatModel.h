@@ -12,8 +12,10 @@
 
 @property (nonatomic, strong) NSMutableArray *dataSource;
 
-- (void)populateDataSource;
+- (void)populateRandomDataSource;
 
-- (void)addItemsToDataSource;
+- (void)addRandomItemsToDataSource:(NSInteger)number;
+
+- (void)addSpecifiedItem:(NSDictionary *)dic;
 
 @end

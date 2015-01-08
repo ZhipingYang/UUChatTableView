@@ -14,7 +14,6 @@
 @implementation ChatModel
 
 - (id)init {
-    
     if (self = [super init]) {
         
     }
@@ -29,43 +28,65 @@
     return _dataSource;
 }
 
-- (void)populateDataSource {
-    self.dataSource = (NSMutableArray *)[self add20items];
+- (void)populateRandomDataSource {
+    self.dataSource = [NSMutableArray array];
+    [self.dataSource addObjectsFromArray:[self additems:1]];
 }
 
-- (void)addItemsToDataSource {
+- (void)addRandomItemsToDataSource:(NSInteger)number{
+
+    for (int i=0; i<number; i++) {
+        [self.dataSource insertObject:[[self additems:1] firstObject] atIndex:0];
+    }
+}
+
+- (void)addSpecifiedItem:(NSDictionary *)dic
+{
+    UUMessageFrame *messageFrame = [[UUMessageFrame alloc]init];
+    UUMessage *message = [[UUMessage alloc] init];
+    NSMutableDictionary *dataDic = [NSMutableDictionary dictionaryWithDictionary:dic];
+  
+    NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/mingxing16.jpg";
+    [dataDic setObject:@1 forKey:@"from"];
+    [dataDic setObject:[[NSDate date] description] forKey:@"strTime"];
+    [dataDic setObject:@"Hello,sister" forKey:@"strName"];
+    [dataDic setObject:URLStr forKey:@"strIcon"];
     
-    [self.dataSource addObjectsFromArray:[self add20items]];
+    [message setWithDict:dataDic];
+    [message minuteOffSetStart:previousTime end:dataDic[@"strTime"]];
+    messageFrame.showTime = message.showDateLabel;
+    [messageFrame setMessage:message];
+    
+    if (message.showDateLabel) {
+        previousTime = dataDic[@"strTime"];
+    }
+    [self.dataSource addObject:messageFrame];
 }
 
 static NSString *previousTime = nil;
 
-- (NSArray *)add20items
+- (NSArray *)additems:(NSInteger)number
 {
     NSMutableArray *result = [NSMutableArray array];
     
-    for (int i=0; i<20; i++) {
+    for (int i=0; i<number; i++) {
         
         UUMessageFrame *messageFrame = [[UUMessageFrame alloc]init];
         UUMessage *message = [[UUMessage alloc] init];
         NSDictionary *dataDic = [self getDic];
         
         [message setWithDict:dataDic];
-        [message minuteOffSetStart:previousTime end:dataDic[@"createTime"]];
+        [message minuteOffSetStart:previousTime end:dataDic[@"strTime"]];
         messageFrame.showTime = message.showDateLabel;
         [messageFrame setMessage:message];
         
         if (message.showDateLabel) {
-            previousTime = dataDic[@"createTime"];
+            previousTime = dataDic[@"strTime"];
         }
-            [result addObject:messageFrame];
-        
-
         [result addObject:messageFrame];
     }
     return result;
 }
-
 
 - (NSDictionary *)getDic
 {
@@ -73,20 +94,26 @@ static NSString *previousTime = nil;
     int randomNum = arc4random()%2;
     switch (randomNum) {
         case 0:// text
-            [dictionary setObject:[self randomString] forKey:@"body"];
+            [dictionary setObject:[self randomString] forKey:@"strContent"];
             break;
         case 1:// picture
-            [dictionary setObject:[UIImage imageNamed:@"haha.jpeg"] forKey:@"body"];
+            [dictionary setObject:[UIImage imageNamed:@"haha.jpeg"] forKey:@"picture"];
             break;
 //            case 2:// audio
-//                [dictionary setObject:@"" forKey:@"body"];
-//                [dictionary setObject:@"" forKey:@"time"];
+//                [dictionary setObject:@"" forKey:@"voice"];
+//                [dictionary setObject:@"" forKey:@"strVoiceTime"];
 //                break;
         default:
             break;
     }
+    static int dateNum = 10;
+    NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/chongwu16.jpg";
+    NSDate *date = [[NSDate date]dateByAddingTimeInterval:arc4random()%1000*(dateNum++) ];
     [dictionary setObject:[NSNumber numberWithInt:0] forKey:@"from"];
     [dictionary setObject:[NSNumber numberWithInt:randomNum] forKey:@"type"];
+    [dictionary setObject:[date description] forKey:@"strTime"];
+    [dictionary setObject:@"Hello,Boss" forKey:@"strName"];
+    [dictionary setObject:URLStr forKey:@"strIcon"];
     
     return dictionary;
 }

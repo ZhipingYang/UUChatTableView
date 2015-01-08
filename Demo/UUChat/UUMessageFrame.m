@@ -36,7 +36,7 @@
     _iconF = CGRectMake(iconX, iconY, ChatIconWH, ChatIconWH);
     
     // 3、计算ID位置
-    _idF = CGRectMake(iconX, iconY+ChatIconWH, ChatIconWH, 20);
+    _nameF = CGRectMake(iconX, iconY+ChatIconWH, ChatIconWH, 20);
     
     // 4、计算内容位置
     CGFloat contentX = CGRectGetMaxX(_iconF)+ChatMargin;
@@ -63,7 +63,7 @@
     }
     _contentF = CGRectMake(contentX, contentY, contentSize.width + ChatContentLeft + ChatContentRight, contentSize.height + ChatContentTop + ChatContentBottom);
     
-    _cellHeight = MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_idF))  + ChatMargin;
+    _cellHeight = MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_nameF))  + ChatMargin;
     
 }
 

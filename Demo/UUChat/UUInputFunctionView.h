@@ -39,4 +39,6 @@
 
 - (id)initWithSuperVC:(UIViewController *)superVC;
 
+- (void)changeSendBtnWithPhoto:(BOOL)isPhoto;
+
 @end

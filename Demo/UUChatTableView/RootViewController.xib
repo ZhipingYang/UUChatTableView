@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RootViewController">
             <connections>
+                <outlet property="bottomConstraint" destination="XyL-18-qIM" id="icX-qG-hy5"/>
                 <outlet property="chatTableView" destination="dyp-1R-xTY" id="tRx-rN-5c4"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -16,9 +17,8 @@
             <rect key="frame" x="0.0" y="64" width="600" height="536"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="dyp-1R-xTY">
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="dyp-1R-xTY">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="496"/>
-                    <color key="backgroundColor" red="0.80796585267950727" green="0.60879913820426756" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="Nr9-03-dfZ"/>
                         <outlet property="delegate" destination="-1" id="LBN-fb-sO7"/>
@@ -33,7 +33,7 @@
                 <constraint firstItem="dyp-1R-xTY" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="hrf-D0-Wex"/>
             </constraints>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-            <point key="canvasLocation" x="25" y="430"/>
+            <point key="canvasLocation" x="-736" y="348"/>
         </view>
     </objects>
 </document>

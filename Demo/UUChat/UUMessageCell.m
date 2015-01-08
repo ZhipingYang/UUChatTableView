@@ -16,8 +16,9 @@
 
 @interface UUMessageCell ()<UUAVAudioPlayerDelegate>
 {
-    NSString *voiceURL;
     AVAudioPlayer *player;
+    NSString *voiceURL;
+    NSData *songData;
     
     UUAVAudioPlayer *audio;
     
@@ -38,6 +39,7 @@
         
         // 1、创建时间
         self.labelTime = [[UILabel alloc] init];
+        self.labelTime.textAlignment = NSTextAlignmentCenter;
         self.labelTime.textColor = [UIColor grayColor];
         self.labelTime.font = ChatTimeFont;
         [self.contentView addSubview:self.labelTime];
@@ -83,7 +85,7 @@
 
 //头像点击
 - (void)btnHeadImageClick:(UIButton *)button{
-    if (self.messageFrame.message.from == UUMessageFromOther) {
+    if ([self.delegate respondsToSelector:@selector(headImageDidClick:userId:)])  {
         [self.delegate headImageDidClick:self userId:self.messageFrame.message.strId];
     }
 }
@@ -95,7 +97,8 @@
         
         audio = [UUAVAudioPlayer sharedInstance];
         audio.delegate = self;
-        [audio playSong:voiceURL];
+//        [audio playSongWithUrl:voiceURL];
+        [audio playSongWithData:songData];
     }
     //图片点击
     else if (self.messageFrame.message.type == UUMessageTypePicture)
@@ -103,8 +106,9 @@
         if (self.btnContent.backImageView) {
             [UUImageAvatarBrowser showImage:self.btnContent.backImageView];
         }
-#warning 注意添加该功能时设置的代理要为Controller(一般都是Controller)，否则不要下面的功能
-        [[(UIViewController *)self.delegate view] endEditing:YES];
+        if ([self.delegate isKindOfClass:[UIViewController class]]) {
+            [[(UIViewController *)self.delegate view] endEditing:YES];
+        }
     }
     //文字点击
     else if (self.messageFrame.message.type == UUMessageTypeText)
@@ -145,25 +149,24 @@
     headImageBackView.frame = messageFrame.iconF;
     self.btnHeadImage.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
     if (message.from == UUMessageFromMe) {
-        
-//        [self.btnHeadImage setBackgroundImageForState:UIControlStateNormal withURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,[CommonMethods getDataFromUserDefaultsWithKey:KEY_HEAD_ICON]]] placeholderImage:[UIImage imageNamed:@"chatfrom_doctor_icon"]];
+        [self.btnHeadImage setBackgroundImageForState:UIControlStateNormal withURL:[NSURL URLWithString:message.strIcon]];
     }else{
-        [self.btnHeadImage setBackgroundImage:[UIImage imageNamed:@"chatfrom_patinet_icon"] forState:UIControlStateNormal];
+        [self.btnHeadImage setBackgroundImageForState:UIControlStateNormal withURL:[NSURL URLWithString:message.strIcon]];
     }
     
     // 3、设置下标
     self.labelNum.text = message.strName;
-    if (messageFrame.idF.origin.x > 160) {
-        self.labelNum.frame = CGRectMake(messageFrame.idF.origin.x - 50, messageFrame.idF.origin.y + 3, 100, messageFrame.idF.size.height);
+    if (messageFrame.nameF.origin.x > 160) {
+        self.labelNum.frame = CGRectMake(messageFrame.nameF.origin.x - 50, messageFrame.nameF.origin.y + 3, 100, messageFrame.nameF.size.height);
         self.labelNum.textAlignment = NSTextAlignmentRight;
     }else{
-        self.labelNum.frame = CGRectMake(messageFrame.idF.origin.x, messageFrame.idF.origin.y + 3, 80, messageFrame.idF.size.height);
+        self.labelNum.frame = CGRectMake(messageFrame.nameF.origin.x, messageFrame.nameF.origin.y + 3, 80, messageFrame.nameF.size.height);
         self.labelNum.textAlignment = NSTextAlignmentLeft;
     }
 
     // 4、设置内容
     
-    //清除cell复用
+    //prepare for reuse
     [self.btnContent setTitle:@"" forState:UIControlStateNormal];
     self.btnContent.voiceBackView.hidden = YES;
     self.btnContent.backImageView.hidden = YES;
@@ -187,13 +190,14 @@
         case UUMessageTypePicture:
         {
             self.btnContent.backImageView.hidden = NO;
-//            [self.btnContent.backImageView setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strPicture]]];
+            self.btnContent.backImageView.image = message.picture;
         }
             break;
         case UUMessageTypeVoice:
         {
             self.btnContent.voiceBackView.hidden = NO;
             self.btnContent.second.text = [NSString stringWithFormat:@"%@'s语音",message.strVoiceTime];
+            songData = message.voice;
 //            voiceURL = [NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strVoice];
         }
             break;

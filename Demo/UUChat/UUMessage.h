@@ -29,8 +29,8 @@ typedef enum {
 @property (nonatomic, copy) NSString *strName;
 
 @property (nonatomic, copy) NSString *strContent;
-@property (nonatomic, copy) NSString *strPicture;
-@property (nonatomic, copy) NSString *strVoice;
+@property (nonatomic, copy) UIImage  *picture;
+@property (nonatomic, copy) NSData   *voice;
 @property (nonatomic, copy) NSString *strVoiceTime;
 
 @property (nonatomic, assign) MessageType type;

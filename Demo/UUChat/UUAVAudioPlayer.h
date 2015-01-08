@@ -22,7 +22,8 @@
 @property (nonatomic, assign)id <UUAVAudioPlayerDelegate>delegate;
 + (UUAVAudioPlayer *)sharedInstance;
 
--(void)playSong:(NSString *)songUrl;
+-(void)playSongWithUrl:(NSString *)songUrl;
+-(void)playSongWithData:(NSData *)songData;
 
 - (void)stopSound;
 @end

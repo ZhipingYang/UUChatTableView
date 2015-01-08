@@ -19,16 +19,15 @@
 #define ChatContentBottom 15 //文本内容与按钮下边缘间隔
 #define ChatContentRight 15 //文本内容与按钮右边缘间隔
 
-#define ChatTimeFont [UIFont systemFontOfSize:14] //时间字体
-#define ChatContentFont [UIFont systemFontOfSize:15] //内容字体
-
+#define ChatTimeFont [UIFont systemFontOfSize:11] //时间字体
+#define ChatContentFont [UIFont systemFontOfSize:14] //内容字体
 
 #import <Foundation/Foundation.h>
 @class UUMessage;
 
 @interface UUMessageFrame : NSObject
 
-@property (nonatomic, assign, readonly) CGRect idF;
+@property (nonatomic, assign, readonly) CGRect nameF;
 @property (nonatomic, assign, readonly) CGRect iconF;
 @property (nonatomic, assign, readonly) CGRect timeF;
 @property (nonatomic, assign, readonly) CGRect contentF;

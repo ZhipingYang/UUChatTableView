@@ -32,12 +32,12 @@
         
         case 1:
             self.type = UUMessageTypePicture;
-            self.strPicture = dict[@"strPicture"];
+            self.picture = dict[@"picture"];
             break;
         
         case 2:
             self.type = UUMessageTypeVoice;
-            self.strVoice = dict[@"strVoice"];
+            self.voice = dict[@"voice"];
             self.strVoiceTime = dict[@"strVoiceTime"];
             break;
             
@@ -71,18 +71,18 @@
     
     if ([lastDate hour]>=5 && [lastDate hour]<12) {
         period = @"上午";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }else if ([lastDate hour]>=12 && [lastDate hour]<=18){
         period = @"下午";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]-12];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else if ([lastDate hour]>18 && [lastDate hour]<=23){
         period = @"晚上";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]-12];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else{
         period = @"凌晨";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }
-    return [NSString stringWithFormat:@"%@ %@%@:%02d",dateStr,period,hour,[lastDate minute]];
+    return [NSString stringWithFormat:@"%@ %@%@:%02d",dateStr,period,hour,(int)[lastDate minute]];
 }
 
 - (void)minuteOffSetStart:(NSString *)start end:(NSString *)end

@@ -21,7 +21,11 @@
     self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
     
     RootViewController *root = [[RootViewController alloc]init];
-    self.window.rootViewController = [[UINavigationController alloc]initWithRootViewController:root];
+    UINavigationController *nav = [[UINavigationController alloc]initWithRootViewController:root];
+//    [nav.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+//    nav.navigationBar.shadowImage = [UIImage new];
+//    nav.navigationBar.translucent = YES;
+    self.window.rootViewController = nav;
     
     [self.window makeKeyAndVisible];
 

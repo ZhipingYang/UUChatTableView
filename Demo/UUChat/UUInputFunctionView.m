@@ -226,36 +226,38 @@
 
 #pragma mark - TextViewDelegate
 
-- (void)textViewDidBeginEditing:(UITextView *)textView
-{
-    placeHold.hidden = YES;
+- (void)textViewDidBeginEditing:(UITextView *)textView{
+    if (self.TextViewInput.text.length>0)
+        placeHold.hidden = YES;
+    else
+        placeHold.hidden = NO;
 }
+
 - (void)textViewDidChange:(UITextView *)textView
 {
-    if (textView.text.length>0) {
-        self.isAbleToSendTextMessage = YES;
-        [self.btnSendMessage setTitle:@"发送" forState:UIControlStateNormal];
-        self.btnSendMessage.frame = RECT_CHANGE_width(self.btnSendMessage, 35);
-        [self.btnSendMessage setBackgroundImage:[UIImage imageNamed:@"chat_send_message"] forState:UIControlStateNormal];
-    }else{
-        self.isAbleToSendTextMessage = NO;
-        [self.btnSendMessage setTitle:@"" forState:UIControlStateNormal];
-        self.btnSendMessage.frame = RECT_CHANGE_width(self.btnSendMessage, 30);
-        [self.btnSendMessage setBackgroundImage:[UIImage imageNamed:@"Chat_take_picture"] forState:UIControlStateNormal];
-    }
+    [self changeSendBtnWithPhoto:textView.text.length>0?NO:YES];
+    placeHold.hidden = textView.text.length>0;
 }
+
+- (void)changeSendBtnWithPhoto:(BOOL)isPhoto
+{
+    self.isAbleToSendTextMessage = !isPhoto;
+    [self.btnSendMessage setTitle:isPhoto?@"":@"发送" forState:UIControlStateNormal];
+    self.btnSendMessage.frame = RECT_CHANGE_width(self.btnSendMessage, isPhoto?30:35);
+    UIImage *image = [UIImage imageNamed:isPhoto?@"Chat_take_picture":@"chat_send_message"];
+    [self.btnSendMessage setBackgroundImage:image forState:UIControlStateNormal];
+}
+
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
     if (self.TextViewInput.text.length>0)
         placeHold.hidden = YES;
     else
         placeHold.hidden = NO;
-    
-//    self.frame = CGRectMake(0, self.superVC.view.frame.size.height-40, 320, 40);
 }
 
 
-#pragma mark - 发送图片
+#pragma mark - Add Picture
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 0) {
@@ -293,27 +295,18 @@
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info{
     UIImage *editImage = [info objectForKey:UIImagePickerControllerEditedImage];
-    
     [self.superVC dismissViewControllerAnimated:YES completion:^{
         [self.delegate UUInputFunctionView:self sendPicture:editImage];
     }];
 }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker{
     [self.superVC dismissViewControllerAnimated:YES completion:nil];
 }
+
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
 
 @end
