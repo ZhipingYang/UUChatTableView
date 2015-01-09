@@ -11,12 +11,19 @@
 @class UUInputFunctionView;
 
 @protocol UUInputFunctionViewDelegate <NSObject>
+
+// text
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message;
+
+// image
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image;
+
+// audio
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second;
+
 @end
 
-@interface UUInputFunctionView : UIView<UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
+@interface UUInputFunctionView : UIView <UIActionSheetDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
 @property (nonatomic, retain) UIButton *btnSendMessage;
 @property (nonatomic, retain) UIButton *btnChangeVoiceState;
@@ -31,5 +38,7 @@
 
 
 - (id)initWithSuperVC:(UIViewController *)superVC;
+
+- (void)changeSendBtnWithPhoto:(BOOL)isPhoto;
 
 @end

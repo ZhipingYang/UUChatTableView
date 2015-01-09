@@ -12,46 +12,46 @@
 @implementation UUMessage
 - (void)setWithDict:(NSDictionary *)dict{
     
-    self.strIcon = dict[@""];
-    NSString *name = [dict[@"userName"] description];
-    if ([name length] > 4) {
-        self.strName = [name substringWithRange:NSMakeRange([name length] - 4,4)];
-    }else{
-        self.strName = name;
-    }
-    self.strId = [dict[@"userId"] description];
-    self.strTime = [self changeTheDateString:dict[@"createTime"]];
+    self.strIcon = dict[@"strIcon"];
+    self.strName = dict[@"strName"];
+    self.strId = dict[@"strId"];
+    self.strTime = [self changeTheDateString:dict[@"strTime"]];
     
-    if ([dict[@"type"] intValue]==1) {
+    if ([dict[@"from"] intValue]==1) {
         self.from = UUMessageFromMe;
     }else{
         self.from = UUMessageFromOther;
     }
     
-    if ([dict[@"transmissionType"] integerValue]==1) {
-        if ([dict[@"imgUrl"] length]<=5) {
+    switch ([dict[@"type"] integerValue]) {
+        
+        case 0:
             self.type = UUMessageTypeText;
-           NSString *str = [dict[@"content"] stringByReplacingOccurrencesOfString:@"   " withString:@""];
-            self.strContent = str;
-        }else{
+            self.strContent = dict[@"strContent"];
+            break;
+        
+        case 1:
             self.type = UUMessageTypePicture;
-            self.strPicture = dict[@"imgUrl"];
-        }
-    }else{
-        self.type = UUMessageTypeVoice;
-        self.strVoice = dict[@"voiceUrl"];
-        self.strVoiceTime = [dict[@"scrollTime"] description];
+            self.picture = dict[@"picture"];
+            break;
+        
+        case 2:
+            self.type = UUMessageTypeVoice;
+            self.voice = dict[@"voice"];
+            self.strVoiceTime = dict[@"strVoiceTime"];
+            break;
+            
+        default:
+            break;
     }
-    
 }
 
-//"08-10 晚上08:09:41.0" -> "昨天 上午10:09"或者"2012-08-10 凌晨07:09"
+//"08-10 晚上08:09:41.0" ->
+//"昨天 上午10:09"或者"2012-08-10 凌晨07:09"
 - (NSString *)changeTheDateString:(NSString *)Str
 {
     NSString *subString = [Str substringWithRange:NSMakeRange(0, 19)];
     NSDate *lastDate = [NSDate dateFromString:subString withFormat:@"yyyy-MM-dd HH:mm:ss"];
-    
-    
     
     NSString *dateStr;  //年月日
     NSString *period;   //时间段
@@ -71,18 +71,18 @@
     
     if ([lastDate hour]>=5 && [lastDate hour]<12) {
         period = @"上午";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }else if ([lastDate hour]>=12 && [lastDate hour]<=18){
         period = @"下午";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]-12];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else if ([lastDate hour]>18 && [lastDate hour]<=23){
         period = @"晚上";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]-12];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else{
         period = @"凌晨";
-        hour = [NSString stringWithFormat:@"%02d",[lastDate hour]];
+        hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }
-    return [NSString stringWithFormat:@"%@ %@%@:%02d",dateStr,period,hour,[lastDate minute]];
+    return [NSString stringWithFormat:@"%@ %@%@:%02d",dateStr,period,hour,(int)[lastDate minute]];
 }
 
 - (void)minuteOffSetStart:(NSString *)start end:(NSString *)end

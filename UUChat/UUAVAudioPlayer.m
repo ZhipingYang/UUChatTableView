@@ -28,13 +28,13 @@
     return sharedInstance;
 }
 
--(void)playSong:(NSString *)urlStr
+-(void)playSongWithUrl:(NSString *)songUrl
 {
     dispatch_async(dispatch_queue_create("dfsfe", NULL), ^{
         
         [self.delegate UUAVAudioPlayerBeiginLoadVoice];
         
-        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:urlStr]];
+        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:songUrl]];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (player) {
@@ -57,6 +57,29 @@
         });
     });
 }
+
+-(void)playSongWithData:(NSData *)songData
+{
+    [self.delegate UUAVAudioPlayerDidFinishPlay];
+
+    if (player) {
+        [player stop];
+        player.delegate = nil;
+        player = nil;
+    }
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"VoicePlayHasInterrupt" object:nil];
+    NSError *playerError;
+    player = [[AVAudioPlayer alloc]initWithData:songData error:&playerError];
+    player.volume = 1.0f;
+    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
+    player.delegate = self;
+    [player play];
+    [self.delegate UUAVAudioPlayerBeiginPlay];
+
+}
+
+
+
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
     [self.delegate UUAVAudioPlayerDidFinishPlay];

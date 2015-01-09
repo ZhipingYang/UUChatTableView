@@ -36,16 +36,16 @@
     _iconF = CGRectMake(iconX, iconY, ChatIconWH, ChatIconWH);
     
     // 3、计算ID位置
-    _idF = CGRectMake(iconX, iconY+ChatIconWH, ChatIconWH, 20);
+    _nameF = CGRectMake(iconX, iconY+ChatIconWH, ChatIconWH, 20);
     
     // 4、计算内容位置
     CGFloat contentX = CGRectGetMaxX(_iconF)+ChatMargin;
     CGFloat contentY = iconY;
+   
     //根据种类分
     CGSize contentSize;
     switch (_message.type) {
         case UUMessageTypeText:
-//            contentSize = [_message.strContent sizeWithFont:ChatContentFont constrainedToSize:CGSizeMake(ChatContentW, CGFLOAT_MAX)];
             contentSize = [_message.strContent sizeWithFont:ChatContentFont  constrainedToSize:CGSizeMake(ChatContentW, CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping];
  
             break;
@@ -63,16 +63,7 @@
     }
     _contentF = CGRectMake(contentX, contentY, contentSize.width + ChatContentLeft + ChatContentRight, contentSize.height + ChatContentTop + ChatContentBottom);
     
-    // 5、计算高度
-    if (_showLine) {
-        _lineF = CGRectMake(ChatMargin, ChatMargin+MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_idF)), Main_Screen_Width-2*ChatMargin, 10);
-        
-        // 计算高度
-        _cellHeight = CGRectGetMaxY(_lineF)  + ChatMargin;
-    }
-    else{
-        _cellHeight = MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_idF))  + ChatMargin;
-    }
+    _cellHeight = MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_nameF))  + ChatMargin;
     
 }
 
