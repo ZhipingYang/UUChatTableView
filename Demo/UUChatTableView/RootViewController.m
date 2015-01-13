@@ -32,8 +32,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self initBar];
     [self addRefreshViews];
     [self loadBaseViewsAndData];
+}
+
+- (void)initBar
+{
+    self.title = @"ChatTableView";
+    self.navigationController.navigationBar.tintColor = [UIColor grayColor];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:nil action:nil];
 }
 
 - (void)addRefreshViews
