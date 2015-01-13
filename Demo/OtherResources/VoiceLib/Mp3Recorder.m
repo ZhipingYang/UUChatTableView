@@ -85,7 +85,7 @@
     double cTime = _recorder.currentTime;
     [_recorder stop];
     
-    if (cTime > 2) {
+    if (cTime > 1) {
         [self audio_PCMtoMP3];
     }else {
         

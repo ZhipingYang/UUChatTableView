@@ -49,7 +49,7 @@
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     unsigned int unitFlags = NSDayCalendarUnit;
     NSDateComponents *comps = [gregorian components:unitFlags fromDate:startDate  toDate:endDate  options:0];
-    int days = [comps day];
+    NSInteger days = [comps day];
     return days;
 }
 
@@ -210,11 +210,11 @@
     NSString *str;
     NSInteger chaDay = [self daysBetweenCurrentDateAndDate];
     if (chaDay == 0) {
-        str = @"今天";
+        str = @"Today";
     }else if (chaDay == 1){
-        str = @"明天";
+        str = @"Tomorrow";
     }else if (chaDay == -1){
-        str = @"昨天";
+        str = @"Yesterday";
     }else{
         str = [self stringYearMonthDay];
     }

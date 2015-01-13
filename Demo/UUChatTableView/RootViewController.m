@@ -19,7 +19,6 @@
 }
 
 @property (strong, nonatomic) MJRefreshHeaderView *head;
-@property (strong, nonatomic) MJRefreshFooterView *foot;
 
 @property (strong, nonatomic) ChatModel *chatModel;
 
@@ -47,28 +46,19 @@
     _head = [MJRefreshHeaderView header];
     _head.scrollView = self.chatTableView;
     _head.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
+       
         [weakSelf.chatModel addRandomItemsToDataSource:pageNum];
+        
         if (weakSelf.chatModel.dataSource.count>pageNum) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [weakSelf.chatTableView reloadData];
-
                 [weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
             });
         }
         [weakSelf.head endRefreshing];
     };
-    
-//     //refresh
-//    _foot = [MJRefreshFooterView footer];
-//    _foot.scrollView = self.chatTableView;
-//    _foot.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
-//        [weakSelf.chatModel populateRandomDataSource];
-//        [weakSelf.chatTableView reloadData];
-//        [weakSelf.foot endRefreshing];
-//    };
-
 }
 
 - (void)loadBaseViewsAndData
@@ -82,14 +72,14 @@
     
     [self.chatTableView reloadData];
     
-    //添加通知
+    //add notification
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
     
 }
 
-//跟随键盘高度变化
+//adjust UUInputFunctionView's height
 -(void)keyboardShow:(NSNotification *)notification
 {
     NSDictionary *userInfo = [notification userInfo];
@@ -117,11 +107,12 @@
     
 }
 
-//滑到底部动画
+//tableView Scroll to bottom
 - (void)tableViewScrollToBottom
 {
     if (self.chatModel.dataSource.count==0)
         return;
+    
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.chatModel.dataSource.count-1 inSection:0];
     [self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
@@ -155,7 +146,7 @@
     [self tableViewScrollToBottom];
 }
 
-#pragma mark - tableView_delegate_datasource
+#pragma mark - tableView delegate & datasource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return self.chatModel.dataSource.count;
