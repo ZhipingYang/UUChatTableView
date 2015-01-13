@@ -14,8 +14,11 @@
 @property (nonatomic, strong) UILabel *subTitleLabel;
 
 + (void)show;
+
 + (void)dismissWithSuccess:(NSString *)str;
+
 + (void)dismissWithError:(NSString *)str;
 
 + (void)changeSubTitle:(NSString *)str;
+
 @end

@@ -9,11 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface UUImageAvatarBrowser : NSObject
-/**
- *	@brief	浏览头像
- *
- *	@param 	oldImageView 	头像所在的imageView
- */
+
+//show imageView on the keyWindow
 +(void)showImage:(UIImageView*)avatarImageView;
 
 @end

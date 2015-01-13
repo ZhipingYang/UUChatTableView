@@ -30,7 +30,7 @@
 
 - (void)populateRandomDataSource {
     self.dataSource = [NSMutableArray array];
-    [self.dataSource addObjectsFromArray:[self additems:1]];
+    [self.dataSource addObjectsFromArray:[self additems:2]];
 }
 
 - (void)addRandomItemsToDataSource:(NSInteger)number{

@@ -70,19 +70,19 @@
     
     
     if ([lastDate hour]>=5 && [lastDate hour]<12) {
-        period = @"上午";
+        period = @"AM";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }else if ([lastDate hour]>=12 && [lastDate hour]<=18){
-        period = @"下午";
+        period = @"PM";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else if ([lastDate hour]>18 && [lastDate hour]<=23){
-        period = @"晚上";
+        period = @"Night";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
     }else{
-        period = @"凌晨";
+        period = @"Dawn";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }
-    return [NSString stringWithFormat:@"%@ %@%@:%02d",dateStr,period,hour,(int)[lastDate minute]];
+    return [NSString stringWithFormat:@"%@ %@ %@:%02d",dateStr,period,hour,(int)[lastDate minute]];
 }
 
 - (void)minuteOffSetStart:(NSString *)start end:(NSString *)end

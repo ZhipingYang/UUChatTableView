@@ -59,8 +59,8 @@
         [self.btnVoiceRecord setBackgroundImage:[UIImage imageNamed:@"chat_message_back"] forState:UIControlStateNormal];
         [self.btnVoiceRecord setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
         [self.btnVoiceRecord setTitleColor:[[UIColor lightGrayColor] colorWithAlphaComponent:0.5] forState:UIControlStateHighlighted];
-        [self.btnVoiceRecord setTitle:@"按住说话" forState:UIControlStateNormal];
-        [self.btnVoiceRecord setTitle:@"松手完成" forState:UIControlStateHighlighted];
+        [self.btnVoiceRecord setTitle:@"Hold to Talk" forState:UIControlStateNormal];
+        [self.btnVoiceRecord setTitle:@"Release to Send" forState:UIControlStateHighlighted];
         [self.btnVoiceRecord addTarget:self action:@selector(beginRecordVoice:) forControlEvents:UIControlEventTouchDown];
         [self.btnVoiceRecord addTarget:self action:@selector(endRecordVoice:) forControlEvents:UIControlEventTouchUpInside];
         [self.btnVoiceRecord addTarget:self action:@selector(cancelRecordVoice:) forControlEvents:UIControlEventTouchUpOutside];
@@ -80,7 +80,7 @@
         
         //输入框的提示语
         placeHold = [[UILabel alloc]initWithFrame:CGRectMake(20, 0, 200, 30)];
-        placeHold.text = @"请输入要咨询的内容";
+        placeHold.text = @"Please input the content";
         placeHold.textColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.8];
         [self.TextViewInput addSubview:placeHold];
         
@@ -122,17 +122,17 @@
         [playTimer invalidate];
         playTimer = nil;
     }
-    [UUProgressHUD dismissWithError:@"录音取消"];
+    [UUProgressHUD dismissWithError:@"Cancel"];
 }
 
 - (void)RemindDragExit:(UIButton *)button
 {
-    [UUProgressHUD changeSubTitle:@"松手取消录音"];
+    [UUProgressHUD changeSubTitle:@"Release to cancel"];
 }
 
 - (void)RemindDragEnter:(UIButton *)button
 {
-    [UUProgressHUD changeSubTitle:@"手指上滑取消发送"];
+    [UUProgressHUD changeSubTitle:@"Slide up to cancel"];
 }
 
 
@@ -150,7 +150,7 @@
 - (void)endConvertWithData:(NSData *)voiceData
 {
     [self.delegate UUInputFunctionView:self sendVoice:voiceData time:playTime+1];
-    [UUProgressHUD dismissWithSuccess:@"录音成功"];
+    [UUProgressHUD dismissWithSuccess:@"Success"];
    
     //缓冲消失时间 (最好有block回调消失完成)
     self.btnVoiceRecord.enabled = NO;
@@ -161,7 +161,7 @@
 
 - (void)failRecord
 {
-    [UUProgressHUD dismissWithSuccess:@"时间过短"];
+    [UUProgressHUD dismissWithSuccess:@"Too short"];
     
     //缓冲消失时间 (最好有block回调消失完成)
     self.btnVoiceRecord.enabled = NO;
@@ -218,7 +218,7 @@
     }
     else{
         [self.TextViewInput resignFirstResponder];
-        UIActionSheet *actionSheet= [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"取消" destructiveButtonTitle:nil otherButtonTitles:@"拍照",@"从相册选择",nil];
+        UIActionSheet *actionSheet= [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Camera",@"Images",nil];
         [actionSheet showInView:self.window];
     }
 }
@@ -242,7 +242,7 @@
 - (void)changeSendBtnWithPhoto:(BOOL)isPhoto
 {
     self.isAbleToSendTextMessage = !isPhoto;
-    [self.btnSendMessage setTitle:isPhoto?@"":@"发送" forState:UIControlStateNormal];
+    [self.btnSendMessage setTitle:isPhoto?@"":@"send" forState:UIControlStateNormal];
     self.btnSendMessage.frame = RECT_CHANGE_width(self.btnSendMessage, isPhoto?30:35);
     UIImage *image = [UIImage imageNamed:isPhoto?@"Chat_take_picture":@"chat_send_message"];
     [self.btnSendMessage setBackgroundImage:image forState:UIControlStateNormal];
@@ -276,7 +276,7 @@
         [self.superVC presentViewController:picker animated:YES completion:^{}];
     }else{
         //如果没有提示用户
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:@"你的设备没有摄像头" delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Tip" message:@"Your device don't have camera" delegate:nil cancelButtonTitle:@"Sure" otherButtonTitles:nil];
         [alert show];
     }
 }

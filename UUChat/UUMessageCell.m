@@ -22,8 +22,6 @@
     
     UUAVAudioPlayer *audio;
     
-    UILabel *fiveMessageRemind;
-    
     UIView *headImageBackView;
 }
 @end
@@ -71,12 +69,6 @@
         [self.btnContent addTarget:self action:@selector(btnContentClick)  forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:self.btnContent];
         
-        fiveMessageRemind = [[UILabel alloc]init];
-        fiveMessageRemind.textColor = [UIColor lightGrayColor];
-        fiveMessageRemind.textAlignment = NSTextAlignmentCenter;
-        fiveMessageRemind.font = [UIFont systemFontOfSize:14];
-        [self.contentView addSubview:fiveMessageRemind];
-        
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(UUAVAudioPlayerDidFinishPlay) name:@"VoicePlayHasInterrupt" object:nil];
 
     }
@@ -92,7 +84,7 @@
 
 
 - (void)btnContentClick{
-    //语音点击
+    //play audio
     if (self.messageFrame.message.type == UUMessageTypeVoice) {
         
         audio = [UUAVAudioPlayer sharedInstance];
@@ -100,7 +92,7 @@
 //        [audio playSongWithUrl:voiceURL];
         [audio playSongWithData:songData];
     }
-    //图片点击
+    //show the picture
     else if (self.messageFrame.message.type == UUMessageTypePicture)
     {
         if (self.btnContent.backImageView) {
@@ -110,7 +102,7 @@
             [[(UIViewController *)self.delegate view] endEditing:YES];
         }
     }
-    //文字点击
+    // show text and gonna copy that
     else if (self.messageFrame.message.type == UUMessageTypeText)
     {
         [self.btnContent becomeFirstResponder];
@@ -196,7 +188,7 @@
         case UUMessageTypeVoice:
         {
             self.btnContent.voiceBackView.hidden = NO;
-            self.btnContent.second.text = [NSString stringWithFormat:@"%@'s语音",message.strVoiceTime];
+            self.btnContent.second.text = [NSString stringWithFormat:@"%@'s Voice",message.strVoiceTime];
             songData = message.voice;
 //            voiceURL = [NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strVoice];
         }

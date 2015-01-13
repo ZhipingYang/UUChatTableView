@@ -10,8 +10,10 @@
 
 @interface UUMessageContentButton : UIButton
 
+//bubble imgae
 @property (nonatomic, retain) UIImageView *backImageView;
 
+//audio
 @property (nonatomic, retain) UIView *voiceBackView;
 @property (nonatomic, retain) UILabel *second;
 @property (nonatomic, retain) UIImageView *voice;
