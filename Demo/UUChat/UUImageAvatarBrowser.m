@@ -9,7 +9,6 @@
 #import "UUImageAvatarBrowser.h"
 
 static UIImageView *orginImageView;
-static CGRect oldframe;
 @implementation UUImageAvatarBrowser
 
 +(void)showImage:(UIImageView *)avatarImageView{
@@ -18,7 +17,7 @@ static CGRect oldframe;
     orginImageView.alpha = 0;
     UIWindow *window=[UIApplication sharedApplication].keyWindow;
     UIView *backgroundView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height)];
-    oldframe=[avatarImageView convertRect:avatarImageView.bounds toView:window];
+    CGRect oldframe=[avatarImageView convertRect:avatarImageView.bounds toView:window];
     backgroundView.backgroundColor=[[UIColor blackColor] colorWithAlphaComponent:0.7];
     backgroundView.alpha=1;
     UIImageView *imageView=[[UIImageView alloc]initWithFrame:oldframe];
@@ -42,7 +41,7 @@ static CGRect oldframe;
     UIView *backgroundView=tap.view;
     UIImageView *imageView=(UIImageView*)[tap.view viewWithTag:1];
     [UIView animateWithDuration:0.3 animations:^{
-        imageView.frame=oldframe;
+        imageView.frame=[orginImageView convertRect:orginImageView.bounds toView:[UIApplication sharedApplication].keyWindow];
     } completion:^(BOOL finished) {
         [backgroundView removeFromSuperview];
         orginImageView.alpha = 1;
