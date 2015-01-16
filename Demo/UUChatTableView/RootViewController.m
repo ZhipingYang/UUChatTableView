@@ -189,7 +189,7 @@
 - (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId
 {
     // headIamgeIcon is clicked
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"" message:@"click !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Tip" message:@"click !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
     [alert show];
 }
 
