@@ -80,7 +80,7 @@
         
         //输入框的提示语
         placeHold = [[UILabel alloc]initWithFrame:CGRectMake(20, 0, 200, 30)];
-        placeHold.text = @"Please input the content";
+        placeHold.text = @"Input the contents here";
         placeHold.textColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.8];
         [self.TextViewInput addSubview:placeHold];
         

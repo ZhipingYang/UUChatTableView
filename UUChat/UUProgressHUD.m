@@ -76,7 +76,7 @@
         centerLabel.text = @"60";
         centerLabel.textAlignment = NSTextAlignmentCenter;
         centerLabel.font = [UIFont systemFontOfSize:30];
-        centerLabel.textColor = [UIColor whiteColor];
+        centerLabel.textColor = [UIColor yellowColor];
 
         
         edgeImageView.frame = CGRectMake(0, 0, 154, 154);
@@ -117,7 +117,7 @@
     if (second <= 10.0f) {
         centerLabel.textColor = [UIColor redColor];
     }else{
-        centerLabel.textColor = [UIColor whiteColor];
+        centerLabel.textColor = [UIColor yellowColor];
     }
     centerLabel.text = [NSString stringWithFormat:@"%.1f",second-0.1];
     [UIView commitAnimations];
