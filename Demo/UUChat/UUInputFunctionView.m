@@ -63,8 +63,7 @@
         [self.btnVoiceRecord setTitle:@"Release to Send" forState:UIControlStateHighlighted];
         [self.btnVoiceRecord addTarget:self action:@selector(beginRecordVoice:) forControlEvents:UIControlEventTouchDown];
         [self.btnVoiceRecord addTarget:self action:@selector(endRecordVoice:) forControlEvents:UIControlEventTouchUpInside];
-        [self.btnVoiceRecord addTarget:self action:@selector(cancelRecordVoice:) forControlEvents:UIControlEventTouchUpOutside];
-        [self.btnVoiceRecord addTarget:self action:@selector(cancelRecordVoice:) forControlEvents:UIControlEventTouchCancel];
+        [self.btnVoiceRecord addTarget:self action:@selector(cancelRecordVoice:) forControlEvents:UIControlEventTouchUpOutside | UIControlEventTouchCancel];
         [self.btnVoiceRecord addTarget:self action:@selector(RemindDragExit:) forControlEvents:UIControlEventTouchDragExit];
         [self.btnVoiceRecord addTarget:self action:@selector(RemindDragEnter:) forControlEvents:UIControlEventTouchDragEnter];
         [self addSubview:self.btnVoiceRecord];
@@ -226,7 +225,8 @@
 
 #pragma mark - TextViewDelegate
 
-- (void)textViewDidBeginEditing:(UITextView *)textView{
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
     if (self.TextViewInput.text.length>0)
         placeHold.hidden = YES;
     else
@@ -304,8 +304,7 @@
     [self.superVC dismissViewControllerAnimated:YES completion:nil];
 }
 
--(void)dealloc
-{
+-(void)dealloc{
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 

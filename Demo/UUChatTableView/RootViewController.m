@@ -15,11 +15,8 @@
 #import "UUMessage.h"
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
-{
-}
 
 @property (strong, nonatomic) MJRefreshHeaderView *head;
-
 @property (strong, nonatomic) ChatModel *chatModel;
 
 @property (weak, nonatomic) IBOutlet UITableView *chatTableView;
@@ -72,6 +69,8 @@
 
 - (void)loadBaseViewsAndData
 {
+    self.chatTableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
+    
     self.chatModel = [[ChatModel alloc]init];
     [self.chatModel populateRandomDataSource];
     
@@ -82,14 +81,13 @@
     [self.chatTableView reloadData];
     
     //add notification
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardShow:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
-    
 }
 
 //adjust UUInputFunctionView's height
--(void)keyboardShow:(NSNotification *)notification
+-(void)keyboardChange:(NSNotification *)notification
 {
     NSDictionary *userInfo = [notification userInfo];
     NSTimeInterval animationDuration;
@@ -130,7 +128,7 @@
 #pragma mark - InputFunctionViewDelegate
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message
 {
-    NSDictionary *dic = @{@"strContent": message, @"type":@0};
+    NSDictionary *dic = @{@"strContent": message, @"type":@(UUMessageTypeText)};
     funcView.TextViewInput.text = @"";
     [funcView changeSendBtnWithPhoto:YES];
     [self dealTheFunctionData:dic];
@@ -138,13 +136,13 @@
 
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image
 {
-    NSDictionary *dic = @{@"picture": image, @"type":@1};
+    NSDictionary *dic = @{@"picture": image, @"type":@(UUMessageTypePicture)};
     [self dealTheFunctionData:dic];
 }
 
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second
 {
-    NSDictionary *dic = @{@"voice": voice, @"strVoiceTime":[NSString stringWithFormat:@"%d",(int)second], @"type":@2};
+    NSDictionary *dic = @{@"voice": voice, @"strVoiceTime":[NSString stringWithFormat:@"%d",(int)second], @"type":@(UUMessageTypeVoice)};
     [self dealTheFunctionData:dic];
 }
 
@@ -156,13 +154,11 @@
 }
 
 #pragma mark - tableView delegate & datasource
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.chatModel.dataSource.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UUMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CellID"];
     if (cell == nil) {
         cell = [[UUMessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellID"];
@@ -181,22 +177,15 @@
     [self.view endEditing:YES];
 }
 
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
-    [self.view endEditing:YES];
-}
-
 #pragma mark - cellDelegate
-- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId
-{
+- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId{
     // headIamgeIcon is clicked
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Tip" message:@"click !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Tip" message:@"HeadImageClick !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
     [alert show];
 }
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 @end
