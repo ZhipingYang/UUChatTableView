@@ -31,6 +31,7 @@ VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格
 ##使用方法 - Usage
 声明一下| 
 ----- | -----
+当前的数据是在固定模式下随机模拟的，不包含用户输入的所有可能性|
 有不习惯`Xib编程`的有问题可以[问我](https://github.com/ZhipingYang/UUChatTableView/issues/new),以前我因为不会而不想去改变 | 
 我还没有去试iOS6下得适配，要是你测试过油问题可以修改提交或者[告诉我](https://github.com/ZhipingYang/UUChatTableView/issues/new) | 
 有人提到群聊功能，只需要在getDic方法添加其他人信息即可[点击查看](https://github.com/ZhipingYang/UUChatTableView/blob/master/Demo/UUChatTableView/ChatModel.m#L91)|
