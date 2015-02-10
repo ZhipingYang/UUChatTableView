@@ -84,9 +84,9 @@
         [self.TextViewInput addSubview:placeHold];
         
         //分割线
-        UIView *lineView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, Main_Screen_Width, 1)];
-        lineView.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.3];
-        [self addSubview:lineView];
+        
+        self.layer.borderWidth = 1;
+        self.layer.borderColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.3].CGColor;
         
         //添加通知
 //        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShowOrHide:) name:UIKeyboardWillChangeFrameNotification object:nil];
