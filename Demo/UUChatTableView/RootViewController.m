@@ -13,6 +13,7 @@
 #import "ChatModel.h"
 #import "UUMessageFrame.h"
 #import "UUMessage.h"
+#import "TestVC.h"
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 
@@ -24,7 +25,9 @@
 
 @end
 
-@implementation RootViewController
+@implementation RootViewController{
+    UUInputFunctionView *IFView;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -34,12 +37,34 @@
     [self loadBaseViewsAndData];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    //add notification
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
+
 - (void)initBar
 {
     self.title = @"ChatTableView";
     self.navigationController.navigationBar.tintColor = [UIColor grayColor];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:nil action:nil];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:@selector(pushToTestVC)];
+}
+
+- (void)pushToTestVC
+{
+    TestVC *test = [[TestVC alloc]init];
+    [self.navigationController pushViewController:test animated:YES];
 }
 
 - (void)addRefreshViews
@@ -74,19 +99,13 @@
     self.chatModel = [[ChatModel alloc]init];
     [self.chatModel populateRandomDataSource];
     
-    UUInputFunctionView *IFView = [[UUInputFunctionView alloc]initWithSuperVC:self];
+    IFView = [[UUInputFunctionView alloc]initWithSuperVC:self];
     IFView.delegate = self;
     [self.view addSubview:IFView];
     
     [self.chatTableView reloadData];
-    
-    //add notification
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
 }
 
-//adjust UUInputFunctionView's height
 -(void)keyboardChange:(NSNotification *)notification
 {
     NSDictionary *userInfo = [notification userInfo];
@@ -102,6 +121,7 @@
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
     
+    //adjust ChatTableView's height
     if (notification.name == UIKeyboardWillShowNotification) {
         self.bottomConstraint.constant = keyboardEndFrame.size.height+40;
     }else{
@@ -110,6 +130,11 @@
 
     [self.view layoutIfNeeded];
     
+    //adjust UUInputFunctionView's originPoint
+    CGRect newFrame = IFView.frame;
+    newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
+    IFView.frame = newFrame;
+
     [UIView commitAnimations];
     
 }
@@ -164,7 +189,6 @@
         cell = [[UUMessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellID"];
         cell.delegate = self;
     }
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [cell setMessageFrame:self.chatModel.dataSource[indexPath.row]];
     return cell;
 }

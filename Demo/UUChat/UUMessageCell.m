@@ -34,7 +34,8 @@
     if (self) {
         
         self.backgroundColor = [UIColor clearColor];
-        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+
         // 1、创建时间
         self.labelTime = [[UILabel alloc] init];
         self.labelTime.textAlignment = NSTextAlignmentCenter;
