@@ -88,6 +88,8 @@ static NSString *previousTime = nil;
     return result;
 }
 
+static int dateNum = 10;
+
 - (NSDictionary *)getDic
 {
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
@@ -106,7 +108,6 @@ static NSString *previousTime = nil;
         default:
             break;
     }
-    static int dateNum = 10;
     NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/chongwu16.jpg";
     NSDate *date = [[NSDate date]dateByAddingTimeInterval:arc4random()%1000*(dateNum++) ];
     [dictionary setObject:[NSNumber numberWithInt:0] forKey:@"from"];
