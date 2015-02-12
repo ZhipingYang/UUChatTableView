@@ -89,7 +89,7 @@
         self.layer.borderColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.3].CGColor;
         
         //添加通知
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShowOrHide:) name:UIKeyboardWillChangeFrameNotification object:nil];
+//        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShowOrHide:) name:UIKeyboardWillChangeFrameNotification object:nil];
         
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(textViewDidEndEditing:) name:UIKeyboardWillHideNotification object:nil];
     }
@@ -169,6 +169,9 @@
     });
 }
 
+/*
+ *由于pop或者dismiss回到ChatVC时存在输入框位置错乱，废弃这个方法
+ 
 #pragma mark - Keyboard methods
 //跟随键盘高度变化
 -(void)keyboardDidShowOrHide:(NSNotification *)notification
@@ -192,6 +195,7 @@
     
     [UIView commitAnimations];
 }
+*/
 
 //改变输入与录音状态
 - (void)voiceRecord:(UIButton *)sender
