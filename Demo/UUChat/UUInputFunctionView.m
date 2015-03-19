@@ -84,13 +84,10 @@
         [self.TextViewInput addSubview:placeHold];
         
         //分割线
-        
         self.layer.borderWidth = 1;
         self.layer.borderColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.3].CGColor;
         
         //添加通知
-//        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShowOrHide:) name:UIKeyboardWillChangeFrameNotification object:nil];
-        
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(textViewDidEndEditing:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
@@ -168,34 +165,6 @@
         self.btnVoiceRecord.enabled = YES;
     });
 }
-
-/*
- *由于pop或者dismiss回到ChatVC时存在输入框位置错乱，废弃这个方法
- 
-#pragma mark - Keyboard methods
-//跟随键盘高度变化
--(void)keyboardDidShowOrHide:(NSNotification *)notification
-{
-    NSDictionary *userInfo = [notification userInfo];
-    NSTimeInterval animationDuration;
-    UIViewAnimationCurve animationCurve;
-    CGRect keyboardEndFrame;
-    
-    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
-    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
-    [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-    
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    [UIView setAnimationCurve:animationCurve];
-    
-    CGRect newFrame = self.frame;
-    newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
-    self.frame = newFrame;
-    
-    [UIView commitAnimations];
-}
-*/
 
 //改变输入与录音状态
 - (void)voiceRecord:(UIButton *)sender

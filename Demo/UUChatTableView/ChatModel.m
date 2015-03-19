@@ -13,21 +13,6 @@
 
 @implementation ChatModel
 
-- (id)init {
-    if (self = [super init]) {
-        
-    }
-    return self;
-}
-
-- (NSMutableArray *)dataSource
-{
-    if (!_dataSource) {
-        _dataSource = [NSMutableArray new];
-    }
-    return _dataSource;
-}
-
 - (void)populateRandomDataSource {
     self.dataSource = [NSMutableArray array];
     [self.dataSource addObjectsFromArray:[self additems:2]];
