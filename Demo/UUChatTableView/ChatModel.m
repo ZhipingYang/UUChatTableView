@@ -13,21 +13,6 @@
 
 @implementation ChatModel
 
-- (id)init {
-    if (self = [super init]) {
-        
-    }
-    return self;
-}
-
-- (NSMutableArray *)dataSource
-{
-    if (!_dataSource) {
-        _dataSource = [NSMutableArray new];
-    }
-    return _dataSource;
-}
-
 - (void)populateRandomDataSource {
     self.dataSource = [NSMutableArray array];
     [self.dataSource addObjectsFromArray:[self additems:2]];
@@ -88,6 +73,8 @@ static NSString *previousTime = nil;
     return result;
 }
 
+static int dateNum = 10;
+
 - (NSDictionary *)getDic
 {
     NSMutableDictionary *dictionary = [[NSMutableDictionary alloc] init];
@@ -106,7 +93,6 @@ static NSString *previousTime = nil;
         default:
             break;
     }
-    static int dateNum = 10;
     NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/chongwu16.jpg";
     NSDate *date = [[NSDate date]dateByAddingTimeInterval:arc4random()%1000*(dateNum++) ];
     [dictionary setObject:[NSNumber numberWithInt:0] forKey:@"from"];
