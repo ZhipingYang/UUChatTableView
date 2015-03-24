@@ -25,9 +25,7 @@
 - (id)initWithSuperVC:(UIViewController *)superVC
 {
     self.superVC = superVC;
-    CGFloat VCWidth = Main_Screen_Width;
-    CGFloat VCHeight = Main_Screen_Height;
-    CGRect frame = CGRectMake(0, VCHeight-40, VCWidth, 40);
+    CGRect frame = CGRectMake(0, Main_Screen_Height-40, Main_Screen_Width, 40);
     
     self = [super initWithFrame:frame];
     if (self) {
@@ -35,7 +33,7 @@
         self.backgroundColor = [UIColor whiteColor];
         //发送消息
         self.btnSendMessage = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.btnSendMessage.frame = CGRectMake(VCWidth-40, 5, 30, 30);
+        self.btnSendMessage.frame = CGRectMake(Main_Screen_Width-40, 5, 30, 30);
         self.isAbleToSendTextMessage = NO;
         [self.btnSendMessage setTitle:@"" forState:UIControlStateNormal];
         [self.btnSendMessage setBackgroundImage:[UIImage imageNamed:@"Chat_take_picture"] forState:UIControlStateNormal];
@@ -231,10 +229,7 @@
 
 - (void)textViewDidBeginEditing:(UITextView *)textView
 {
-    if (self.TextViewInput.text.length>0)
-        placeHold.hidden = YES;
-    else
-        placeHold.hidden = NO;
+    placeHold.hidden = self.TextViewInput.text.length > 0;
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -254,10 +249,7 @@
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
-    if (self.TextViewInput.text.length>0)
-        placeHold.hidden = YES;
-    else
-        placeHold.hidden = NO;
+    placeHold.hidden = self.TextViewInput.text.length > 0;
 }
 
 
