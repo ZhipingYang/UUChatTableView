@@ -18,6 +18,7 @@
         self.backImageView.userInteractionEnabled = YES;
         self.backImageView.layer.cornerRadius = 5;
         self.backImageView.layer.masksToBounds  = YES;
+        self.backImageView.contentMode = UIViewContentModeScaleAspectFill;
         self.backImageView.backgroundColor = [UIColor yellowColor];
         [self addSubview:self.backImageView];
         

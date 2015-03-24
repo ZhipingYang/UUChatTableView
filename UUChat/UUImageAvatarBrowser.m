@@ -23,6 +23,8 @@ static UIImageView *orginImageView;
     UIImageView *imageView=[[UIImageView alloc]initWithFrame:oldframe];
     imageView.image=image;
     imageView.tag=1;
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    imageView.clipsToBounds = YES;
     [backgroundView addSubview:imageView];
     [window addSubview:backgroundView];
     
