@@ -87,11 +87,14 @@
 - (void)btnContentClick{
     //play audio
     if (self.messageFrame.message.type == UUMessageTypeVoice) {
-        
-        audio = [UUAVAudioPlayer sharedInstance];
-        audio.delegate = self;
-//        [audio playSongWithUrl:voiceURL];
-        [audio playSongWithData:songData];
+        if([audio.player isPlaying]){
+            [self UUAVAudioPlayerDidFinishPlay];
+        }else{
+            audio = [UUAVAudioPlayer sharedInstance];
+            audio.delegate = self;
+            //        [audio playSongWithUrl:voiceURL];
+            [audio playSongWithData:songData];
+        }
     }
     //show the picture
     else if (self.messageFrame.message.type == UUMessageTypePicture)

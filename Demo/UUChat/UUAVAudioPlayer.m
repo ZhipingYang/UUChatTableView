@@ -11,9 +11,7 @@
 
 
 @interface UUAVAudioPlayer ()<AVAudioPlayerDelegate>
-{
-    AVAudioPlayer *player;
-}
+
 @end
 
 @implementation UUAVAudioPlayer
@@ -37,22 +35,22 @@
         NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:songUrl]];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (player) {
+            if (_player) {
                 [self.delegate UUAVAudioPlayerDidFinishPlay];
-                [player stop];
-                player.delegate = nil;
-                player = nil;
+                [_player stop];
+                _player.delegate = nil;
+                _player = nil;
             }
             [[NSNotificationCenter defaultCenter]postNotificationName:@"VoicePlayHasInterrupt" object:nil];
             NSError *playerError;
-            player = [[AVAudioPlayer alloc]initWithData:data error:&playerError];
-            player.volume = 1.0f;
-            if (player == nil){
+            _player = [[AVAudioPlayer alloc]initWithData:data error:&playerError];
+            _player.volume = 1.0f;
+            if (_player == nil){
                 NSLog(@"ERror creating player: %@", [playerError description]);
             }
             [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
-            player.delegate = self;
-            [player play];
+            _player.delegate = self;
+            [_player play];
             [self.delegate UUAVAudioPlayerBeiginPlay];
         });
     });
@@ -62,18 +60,18 @@
 {
     [self.delegate UUAVAudioPlayerDidFinishPlay];
 
-    if (player) {
-        [player stop];
-        player.delegate = nil;
-        player = nil;
+    if (_player) {
+        [_player stop];
+        _player.delegate = nil;
+        _player = nil;
     }
     [[NSNotificationCenter defaultCenter]postNotificationName:@"VoicePlayHasInterrupt" object:nil];
     NSError *playerError;
-    player = [[AVAudioPlayer alloc]initWithData:songData error:&playerError];
-    player.volume = 1.0f;
+    _player = [[AVAudioPlayer alloc]initWithData:songData error:&playerError];
+    _player.volume = 1.0f;
     [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
-    player.delegate = self;
-    [player play];
+    _player.delegate = self;
+    [_player play];
     [self.delegate UUAVAudioPlayerBeiginPlay];
 
 }
@@ -87,8 +85,8 @@
 
 - (void)stopSound
 {
-    if (player && player.isPlaying) {
-        [player stop];
+    if (_player && _player.isPlaying) {
+        [_player stop];
     }
 }
 
