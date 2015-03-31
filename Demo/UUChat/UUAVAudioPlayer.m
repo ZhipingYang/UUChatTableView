@@ -47,12 +47,10 @@
 
 -(void)playSoundWithData:(NSData *)soundData{
     if (_player) {
-        [self.delegate UUAVAudioPlayerDidFinishPlay];
         [_player stop];
         _player.delegate = nil;
         _player = nil;
     }
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"VoicePlayHasInterrupt" object:nil];
     NSError *playerError;
     _player = [[AVAudioPlayer alloc]initWithData:soundData error:&playerError];
     _player.volume = 1.0f;

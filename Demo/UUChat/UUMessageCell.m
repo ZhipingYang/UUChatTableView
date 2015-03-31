@@ -23,6 +23,7 @@
     UUAVAudioPlayer *audio;
     
     UIView *headImageBackView;
+    BOOL contentVoiceIsPlaying;
 }
 @end
 
@@ -77,6 +78,7 @@
                                                  selector:@selector(sensorStateChange:)
                                                      name:UIDeviceProximityStateDidChangeNotification
                                                    object:nil];
+        contentVoiceIsPlaying = NO;
 
     }
     return self;
@@ -93,13 +95,15 @@
 - (void)btnContentClick{
     //play audio
     if (self.messageFrame.message.type == UUMessageTypeVoice) {
-        if([audio.player isPlaying]){
-            [self UUAVAudioPlayerDidFinishPlay];
-        }else{
+        if(!contentVoiceIsPlaying){
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
+            contentVoiceIsPlaying = YES;
             audio = [UUAVAudioPlayer sharedInstance];
             audio.delegate = self;
             //        [audio playSongWithUrl:voiceURL];
             [audio playSongWithData:songData];
+        }else{
+            [self UUAVAudioPlayerDidFinishPlay];
         }
     }
     //show the picture
@@ -132,6 +136,7 @@
 }
 - (void)UUAVAudioPlayerDidFinishPlay
 {
+    contentVoiceIsPlaying = NO;
     [self.btnContent stopPlay];
     [[UUAVAudioPlayer sharedInstance]stopSound];
 }
