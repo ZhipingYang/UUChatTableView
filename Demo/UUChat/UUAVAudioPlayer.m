@@ -48,7 +48,7 @@
             if (_player == nil){
                 NSLog(@"ERror creating player: %@", [playerError description]);
             }
-            [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
+            [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];
             _player.delegate = self;
             [_player play];
             [self.delegate UUAVAudioPlayerBeiginPlay];
@@ -69,7 +69,7 @@
     NSError *playerError;
     _player = [[AVAudioPlayer alloc]initWithData:songData error:&playerError];
     _player.volume = 1.0f;
-    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategorySoloAmbient error: nil];
+    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];
     _player.delegate = self;
     [_player play];
     [self.delegate UUAVAudioPlayerBeiginPlay];
