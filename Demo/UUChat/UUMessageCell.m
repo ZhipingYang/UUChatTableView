@@ -175,6 +175,19 @@
         [self.btnContent setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
         self.btnContent.contentEdgeInsets = UIEdgeInsetsMake(ChatContentTop, ChatContentLeft, ChatContentBottom, ChatContentRight);
     }
+    
+    //背景气泡图
+    UIImage *normal;
+    if (message.from == UUMessageFromMe) {
+        normal = [UIImage imageNamed:@"chatto_bg_normal"];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
+    }
+    else{
+        normal = [UIImage imageNamed:@"chatfrom_bg_normal"];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
+    }
+    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
+    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
 
     switch (message.type) {
         case UUMessageTypeText:
@@ -184,6 +197,8 @@
         {
             self.btnContent.backImageView.hidden = NO;
             self.btnContent.backImageView.image = message.picture;
+            self.btnContent.backImageView.frame = CGRectMake(0, 0, self.btnContent.frame.size.width, self.btnContent.frame.size.height);
+            [self makeMaskView:self.btnContent.backImageView withImage:normal];
         }
             break;
         case UUMessageTypeVoice:
@@ -198,20 +213,13 @@
         default:
             break;
     }
-    
-    //背景气泡图
-    UIImage *normal;
-    if (message.from == UUMessageFromMe) {
-        normal = [UIImage imageNamed:@"chatto_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
-    }
-    else{
-        normal = [UIImage imageNamed:@"chatfrom_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
-    }
-    
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
+}
+
+- (void)makeMaskView:(UIView *)view withImage:(UIImage *)image
+{
+    UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
+    imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
+    view.layer.mask = imageViewMask.layer;
 }
 
 @end
