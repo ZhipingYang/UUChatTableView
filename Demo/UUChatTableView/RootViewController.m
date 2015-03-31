@@ -31,6 +31,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    //开启红外线感应
+    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
+
     [self initBar];
     [self addRefreshViews];
     [self loadBaseViewsAndData];

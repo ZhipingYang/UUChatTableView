@@ -71,6 +71,12 @@
         [self.contentView addSubview:self.btnContent];
         
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(UUAVAudioPlayerDidFinishPlay) name:@"VoicePlayHasInterrupt" object:nil];
+        
+        //红外线感应监听
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sensorStateChange:)
+                                                     name:UIDeviceProximityStateDidChangeNotification
+                                                   object:nil];
 
     }
     return self;
@@ -223,6 +229,19 @@
     UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
     imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
     view.layer.mask = imageViewMask.layer;
+}
+
+//处理监听触发事件
+-(void)sensorStateChange:(NSNotificationCenter *)notification;
+{
+    if ([[UIDevice currentDevice] proximityState] == YES){
+        NSLog(@"Device is close to user");
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    }
+    else{
+        NSLog(@"Device is not close to user");
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    }
 }
 
 @end
