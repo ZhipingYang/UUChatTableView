@@ -8,7 +8,8 @@ Cocoa UI component for chat bubbles with text, images and audio support
 
 ## 截图 - ScreenShot
 ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-5.jpg) ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-4.jpg)
-
+#### 群聊（GroupChat）效果图（新添UI细节）
+![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/chat_3.jpg)   ![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/chat_2.jpg)
 ##使用类介绍 - Introduce
 
 [类名](https://github.com/ZhipingYang/UUChatTableView/tree/master/UUChat) | 作用及用法
@@ -35,6 +36,7 @@ VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格
 有不习惯`Xib编程`的有问题可以[问我](https://github.com/ZhipingYang/UUChatTableView/issues/new),以前我因为不会而不想去改变 | 
 我还没有去试iOS6下得适配，要是你测试过油问题可以修改提交或者[告诉我](https://github.com/ZhipingYang/UUChatTableView/issues/new) | 
 有人提到群聊功能，只需要在getDic方法添加其他人信息即可[点击查看](https://github.com/ZhipingYang/UUChatTableView/blob/master/Demo/UUChatTableView/ChatModel.m#L78)|
+感谢[丁南](https://github.com/ijinmao)修复语音播放及其他的一些bug|
 
 
 ####添加代理
@@ -53,4 +55,5 @@ VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格
 	//图片点击可有可无
 	- (void)cellContentDidClick:(UUMessageCell *)cell image:(UIImage *)contentImage;
 
-	
+
+
