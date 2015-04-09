@@ -100,6 +100,7 @@
     [self.view addSubview:IFView];
     
     [self.chatTableView reloadData];
+    [self tableViewScrollToBottom];
 }
 
 -(void)keyboardChange:(NSNotification *)notification
@@ -149,7 +150,8 @@
 #pragma mark - InputFunctionViewDelegate
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message
 {
-    NSDictionary *dic = @{@"strContent": message, @"type":@(UUMessageTypeText)};
+    NSDictionary *dic = @{@"strContent": message,
+                          @"type": @(UUMessageTypeText)};
     funcView.TextViewInput.text = @"";
     [funcView changeSendBtnWithPhoto:YES];
     [self dealTheFunctionData:dic];
@@ -157,13 +159,16 @@
 
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image
 {
-    NSDictionary *dic = @{@"picture": image, @"type":@(UUMessageTypePicture)};
+    NSDictionary *dic = @{@"picture": image,
+                          @"type": @(UUMessageTypePicture)};
     [self dealTheFunctionData:dic];
 }
 
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second
 {
-    NSDictionary *dic = @{@"voice": voice, @"strVoiceTime":[NSString stringWithFormat:@"%d",(int)second], @"type":@(UUMessageTypeVoice)};
+    NSDictionary *dic = @{@"voice": voice,
+                          @"strVoiceTime": [NSString stringWithFormat:@"%d",(int)second],
+                          @"type": @(UUMessageTypeVoice)};
     [self dealTheFunctionData:dic];
 }
 
@@ -200,7 +205,7 @@
 #pragma mark - cellDelegate
 - (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId{
     // headIamgeIcon is clicked
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Tip" message:@"HeadImageClick !!!" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:cell.messageFrame.message.strName message:@"headImage clicked" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
     [alert show];
 }
 

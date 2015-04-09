@@ -8,17 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-typedef enum {
+typedef NS_ENUM(NSInteger, MessageType) {
     UUMessageTypeText     = 0 , // 文字
     UUMessageTypePicture  = 1 , // 图片
     UUMessageTypeVoice    = 2   // 语音
-} MessageType;
+};
 
 
-typedef enum {
-    UUMessageFromMe    = 100,   // 自己发的
-    UUMessageFromOther = 101    // 别人发得
-} MessageFrom;
+typedef NS_ENUM(NSInteger, MessageFrom) {
+    UUMessageFromMe    = 0,   // 自己发的
+    UUMessageFromOther = 1    // 别人发得
+};
 
 
 @interface UUMessage : NSObject

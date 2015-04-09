@@ -63,7 +63,9 @@
 		B7B905EB1A5BCFD700A46EFD /* UUMessageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905E21A5BCFD700A46EFD /* UUMessageFrame.m */; };
 		B7B905EC1A5BCFD700A46EFD /* UUProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905E41A5BCFD700A46EFD /* UUProgressHUD.m */; };
 		B7B905EF1A5BD04700A46EFD /* ChatModel.m in Sources */ = {isa = PBXBuildFile; fileRef = B7B905EE1A5BD04700A46EFD /* ChatModel.m */; };
-		B7B905F11A5BDBFE00A46EFD /* haha.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = B7B905F01A5BDBFE00A46EFD /* haha.jpeg */; };
+		F0D1432F1AD6A56300881F5B /* 0.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = F0D1432A1AD6A56300881F5B /* 0.jpeg */; };
+		F0D143301AD6A56300881F5B /* 1.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = F0D1432B1AD6A56300881F5B /* 1.jpeg */; };
+		F0D143351AD6A8D600881F5B /* headImage.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = F0D143341AD6A8D600881F5B /* headImage.jpeg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -177,7 +179,9 @@
 		B7B905E41A5BCFD700A46EFD /* UUProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUProgressHUD.m; sourceTree = "<group>"; };
 		B7B905ED1A5BD04700A46EFD /* ChatModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatModel.h; sourceTree = "<group>"; };
 		B7B905EE1A5BD04700A46EFD /* ChatModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatModel.m; sourceTree = "<group>"; };
-		B7B905F01A5BDBFE00A46EFD /* haha.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = haha.jpeg; sourceTree = "<group>"; };
+		F0D1432A1AD6A56300881F5B /* 0.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 0.jpeg; sourceTree = "<group>"; };
+		F0D1432B1AD6A56300881F5B /* 1.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpeg; sourceTree = "<group>"; };
+		F0D143341AD6A8D600881F5B /* headImage.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = headImage.jpeg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -292,9 +296,9 @@
 		B7B905671A5B7F8200A46EFD /* pic */ = {
 			isa = PBXGroup;
 			children = (
+				F0D143291AD6A50000881F5B /* photo */,
 				B72482A41A5E5B3600A6F9DF /* chatfrom_bg_normal.png */,
 				B724829F1A5E54F400A6F9DF /* chatto_bg_normal.png */,
-				B7B905F01A5BDBFE00A46EFD /* haha.jpeg */,
 				B7B905681A5B7F8B00A46EFD /* chat_animation_white1.png */,
 				B7B905691A5B7F8B00A46EFD /* chat_animation_white2.png */,
 				B7B9056A1A5B7F8B00A46EFD /* chat_animation_white3.png */,
@@ -402,6 +406,16 @@
 			path = UUChat;
 			sourceTree = "<group>";
 		};
+		F0D143291AD6A50000881F5B /* photo */ = {
+			isa = PBXGroup;
+			children = (
+				F0D143341AD6A8D600881F5B /* headImage.jpeg */,
+				F0D1432A1AD6A56300881F5B /* 0.jpeg */,
+				F0D1432B1AD6A56300881F5B /* 1.jpeg */,
+			);
+			path = photo;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -489,18 +503,20 @@
 				B7B905CF1A5B810400A46EFD /* MJRefresh.bundle in Resources */,
 				B7B9057C1A5B7F8B00A46EFD /* chat_animation3.png in Resources */,
 				B7B905841A5B7F8B00A46EFD /* chatfrom_doctor_icon.png in Resources */,
+				F0D143301AD6A56300881F5B /* 1.jpeg in Resources */,
 				B7B9052D1A5B770200A46EFD /* LaunchScreen.xib in Resources */,
 				B7B9057E1A5B7F8B00A46EFD /* chat_message_back.png in Resources */,
 				B7B905461A5B772900A46EFD /* RootViewController.xib in Resources */,
+				F0D1432F1AD6A56300881F5B /* 0.jpeg in Resources */,
 				B7B905791A5B7F8B00A46EFD /* chat_animation_white3.png in Resources */,
 				B7B9052A1A5B770200A46EFD /* Images.xcassets in Resources */,
 				B7B9057F1A5B7F8B00A46EFD /* Chat_record_circle.png in Resources */,
 				B7B9057A1A5B7F8B00A46EFD /* chat_animation1.png in Resources */,
 				B7B905811A5B7F8B00A46EFD /* Chat_take_picture.png in Resources */,
+				F0D143351AD6A8D600881F5B /* headImage.jpeg in Resources */,
 				B7B9057D1A5B7F8B00A46EFD /* chat_ipunt_message.png in Resources */,
 				B7B9057B1A5B7F8B00A46EFD /* chat_animation2.png in Resources */,
 				B72482A51A5E5B3600A6F9DF /* chatfrom_bg_normal.png in Resources */,
-				B7B905F11A5BDBFE00A46EFD /* haha.jpeg in Resources */,
 				B72482A11A5E54F400A6F9DF /* chatto_bg_normal.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

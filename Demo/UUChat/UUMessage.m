@@ -16,12 +16,7 @@
     self.strName = dict[@"strName"];
     self.strId = dict[@"strId"];
     self.strTime = [self changeTheDateString:dict[@"strTime"]];
-    
-    if ([dict[@"from"] intValue]==1) {
-        self.from = UUMessageFromMe;
-    }else{
-        self.from = UUMessageFromOther;
-    }
+    self.from = [dict[@"from"] intValue];
     
     switch ([dict[@"type"] integerValue]) {
         
