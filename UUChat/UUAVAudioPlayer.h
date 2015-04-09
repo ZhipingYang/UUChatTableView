@@ -18,7 +18,7 @@
 @end
 
 @interface UUAVAudioPlayer : NSObject
-
+@property (nonatomic ,strong)  AVAudioPlayer *player;
 @property (nonatomic, assign)id <UUAVAudioPlayerDelegate>delegate;
 + (UUAVAudioPlayer *)sharedInstance;
 

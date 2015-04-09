@@ -23,6 +23,7 @@
     UUAVAudioPlayer *audio;
     
     UIView *headImageBackView;
+    BOOL contentVoiceIsPlaying;
 }
 @end
 
@@ -34,7 +35,8 @@
     if (self) {
         
         self.backgroundColor = [UIColor clearColor];
-        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+
         // 1、创建时间
         self.labelTime = [[UILabel alloc] init];
         self.labelTime.textAlignment = NSTextAlignmentCenter;
@@ -70,6 +72,13 @@
         [self.contentView addSubview:self.btnContent];
         
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(UUAVAudioPlayerDidFinishPlay) name:@"VoicePlayHasInterrupt" object:nil];
+        
+        //红外线感应监听
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sensorStateChange:)
+                                                     name:UIDeviceProximityStateDidChangeNotification
+                                                   object:nil];
+        contentVoiceIsPlaying = NO;
 
     }
     return self;
@@ -86,11 +95,16 @@
 - (void)btnContentClick{
     //play audio
     if (self.messageFrame.message.type == UUMessageTypeVoice) {
-        
-        audio = [UUAVAudioPlayer sharedInstance];
-        audio.delegate = self;
-//        [audio playSongWithUrl:voiceURL];
-        [audio playSongWithData:songData];
+        if(!contentVoiceIsPlaying){
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
+            contentVoiceIsPlaying = YES;
+            audio = [UUAVAudioPlayer sharedInstance];
+            audio.delegate = self;
+            //        [audio playSongWithUrl:voiceURL];
+            [audio playSongWithData:songData];
+        }else{
+            [self UUAVAudioPlayerDidFinishPlay];
+        }
     }
     //show the picture
     else if (self.messageFrame.message.type == UUMessageTypePicture)
@@ -122,6 +136,7 @@
 }
 - (void)UUAVAudioPlayerDidFinishPlay
 {
+    contentVoiceIsPlaying = NO;
     [self.btnContent stopPlay];
     [[UUAVAudioPlayer sharedInstance]stopSound];
 }
@@ -174,6 +189,19 @@
         [self.btnContent setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
         self.btnContent.contentEdgeInsets = UIEdgeInsetsMake(ChatContentTop, ChatContentLeft, ChatContentBottom, ChatContentRight);
     }
+    
+    //背景气泡图
+    UIImage *normal;
+    if (message.from == UUMessageFromMe) {
+        normal = [UIImage imageNamed:@"chatto_bg_normal"];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
+    }
+    else{
+        normal = [UIImage imageNamed:@"chatfrom_bg_normal"];
+        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
+    }
+    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
+    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
 
     switch (message.type) {
         case UUMessageTypeText:
@@ -183,6 +211,8 @@
         {
             self.btnContent.backImageView.hidden = NO;
             self.btnContent.backImageView.image = message.picture;
+            self.btnContent.backImageView.frame = CGRectMake(0, 0, self.btnContent.frame.size.width, self.btnContent.frame.size.height);
+            [self makeMaskView:self.btnContent.backImageView withImage:normal];
         }
             break;
         case UUMessageTypeVoice:
@@ -197,20 +227,26 @@
         default:
             break;
     }
-    
-    //背景气泡图
-    UIImage *normal;
-    if (message.from == UUMessageFromMe) {
-        normal = [UIImage imageNamed:@"chatto_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
+}
+
+- (void)makeMaskView:(UIView *)view withImage:(UIImage *)image
+{
+    UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
+    imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
+    view.layer.mask = imageViewMask.layer;
+}
+
+//处理监听触发事件
+-(void)sensorStateChange:(NSNotificationCenter *)notification;
+{
+    if ([[UIDevice currentDevice] proximityState] == YES){
+        NSLog(@"Device is close to user");
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     }
     else{
-        normal = [UIImage imageNamed:@"chatfrom_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
+        NSLog(@"Device is not close to user");
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     }
-    
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
 }
 
 @end

@@ -25,9 +25,7 @@
 - (id)initWithSuperVC:(UIViewController *)superVC
 {
     self.superVC = superVC;
-    CGFloat VCWidth = Main_Screen_Width;
-    CGFloat VCHeight = Main_Screen_Height;
-    CGRect frame = CGRectMake(0, VCHeight-40, VCWidth, 40);
+    CGRect frame = CGRectMake(0, Main_Screen_Height-40, Main_Screen_Width, 40);
     
     self = [super initWithFrame:frame];
     if (self) {
@@ -35,7 +33,7 @@
         self.backgroundColor = [UIColor whiteColor];
         //发送消息
         self.btnSendMessage = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.btnSendMessage.frame = CGRectMake(VCWidth-40, 5, 30, 30);
+        self.btnSendMessage.frame = CGRectMake(Main_Screen_Width-40, 5, 30, 30);
         self.isAbleToSendTextMessage = NO;
         [self.btnSendMessage setTitle:@"" forState:UIControlStateNormal];
         [self.btnSendMessage setBackgroundImage:[UIImage imageNamed:@"Chat_take_picture"] forState:UIControlStateNormal];
@@ -84,13 +82,10 @@
         [self.TextViewInput addSubview:placeHold];
         
         //分割线
-        
         self.layer.borderWidth = 1;
         self.layer.borderColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.3].CGColor;
         
         //添加通知
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardDidShowOrHide:) name:UIKeyboardWillChangeFrameNotification object:nil];
-        
         [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(textViewDidEndEditing:) name:UIKeyboardWillHideNotification object:nil];
     }
     return self;
@@ -169,30 +164,6 @@
     });
 }
 
-#pragma mark - Keyboard methods
-//跟随键盘高度变化
--(void)keyboardDidShowOrHide:(NSNotification *)notification
-{
-    NSDictionary *userInfo = [notification userInfo];
-    NSTimeInterval animationDuration;
-    UIViewAnimationCurve animationCurve;
-    CGRect keyboardEndFrame;
-    
-    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
-    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
-    [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-    
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    [UIView setAnimationCurve:animationCurve];
-    
-    CGRect newFrame = self.frame;
-    newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
-    self.frame = newFrame;
-    
-    [UIView commitAnimations];
-}
-
 //改变输入与录音状态
 - (void)voiceRecord:(UIButton *)sender
 {
@@ -227,10 +198,7 @@
 
 - (void)textViewDidBeginEditing:(UITextView *)textView
 {
-    if (self.TextViewInput.text.length>0)
-        placeHold.hidden = YES;
-    else
-        placeHold.hidden = NO;
+    placeHold.hidden = self.TextViewInput.text.length > 0;
 }
 
 - (void)textViewDidChange:(UITextView *)textView
@@ -250,10 +218,7 @@
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
-    if (self.TextViewInput.text.length>0)
-        placeHold.hidden = YES;
-    else
-        placeHold.hidden = NO;
+    placeHold.hidden = self.TextViewInput.text.length > 0;
 }
 
 
