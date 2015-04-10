@@ -132,14 +132,10 @@
 }
 - (void)UUAVAudioPlayerBeiginPlay
 {
-    //开启红外线感应
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
     [self.btnContent didLoadVoice];
 }
 - (void)UUAVAudioPlayerDidFinishPlay
 {
-    //关闭红外线感应
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
     contentVoiceIsPlaying = NO;
     [self.btnContent stopPlay];
     [[UUAVAudioPlayer sharedInstance]stopSound];
