@@ -8,7 +8,6 @@
 
 #import "RootViewController.h"
 #import "UUInputFunctionView.h"
-#import "MJRefresh.h"
 #import "UUMessageCell.h"
 #import "ChatModel.h"
 #import "UUMessageFrame.h"
@@ -16,7 +15,6 @@
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 
-@property (strong, nonatomic) MJRefreshHeaderView *head;
 @property (strong, nonatomic) ChatModel *chatModel;
 
 @property (weak, nonatomic) IBOutlet UITableView *chatTableView;
@@ -31,11 +29,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    //开启红外线感应
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
-
     [self initBar];
-    [self addRefreshViews];
     [self loadBaseViewsAndData];
 }
 
@@ -63,29 +57,19 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:nil];
 }
 
-- (void)addRefreshViews
-{
-    __weak typeof(self) weakSelf = self;
-    
-    //load more
+- (void)addRandomChatItems{
     int pageNum = 3;
-    
-    _head = [MJRefreshHeaderView header];
-    _head.scrollView = self.chatTableView;
-    _head.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
-       
-        [weakSelf.chatModel addRandomItemsToDataSource:pageNum];
-        
-        if (weakSelf.chatModel.dataSource.count>pageNum) {
+    //wait a second, so that the indicator can be seen 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.chatModel addRandomItemsToDataSource:pageNum];
+        if (self.chatModel.dataSource.count>pageNum) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
-            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [weakSelf.chatTableView reloadData];
-                [weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+                [self.chatTableView reloadData];
+                [self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
             });
         }
-        [weakSelf.head endRefreshing];
-    };
+    });
 }
 
 - (void)loadBaseViewsAndData
@@ -99,9 +83,25 @@
     IFView.delegate = self;
     [self.view addSubview:IFView];
     
+    [self loadRefreshIndicator];
+    
     [self.chatTableView reloadData];
     [self tableViewScrollToBottom];
 }
+
+-(void)loadRefreshIndicator{
+    CGRect screenFrame = [[UIScreen mainScreen] bounds];
+    self.chatTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenFrame.size.width, 44)];
+    CGRect indicatorFrame = self.chatTableView.frame;
+    UIActivityIndicatorView *refreshView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    indicatorFrame = refreshView.frame;
+    indicatorFrame.origin.x = screenFrame.size.width/2-indicatorFrame.size.width/2;
+    indicatorFrame.origin.y = self.chatTableView.tableHeaderView.frame.size.height/2-indicatorFrame.size.height/2;
+    refreshView.frame = indicatorFrame;
+    [refreshView startAnimating];
+    [self.chatTableView.tableHeaderView addSubview:refreshView];
+}
+
 
 -(void)keyboardChange:(NSNotification *)notification
 {
@@ -200,6 +200,12 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [self.view endEditing:YES];
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(indexPath.row == 0){
+        [self addRandomChatItems];
+    }
 }
 
 #pragma mark - cellDelegate
