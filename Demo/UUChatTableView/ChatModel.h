@@ -12,6 +12,8 @@
 
 @property (nonatomic, strong) NSMutableArray *dataSource;
 
+@property (nonatomic) BOOL isGroupChat;
+
 - (void)populateRandomDataSource;
 
 - (void)addRandomItemsToDataSource:(NSInteger)number;

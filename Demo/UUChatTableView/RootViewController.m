@@ -8,6 +8,7 @@
 
 #import "RootViewController.h"
 #import "UUInputFunctionView.h"
+#import "MJRefresh.h"
 #import "UUMessageCell.h"
 #import "ChatModel.h"
 #import "UUMessageFrame.h"
@@ -15,6 +16,7 @@
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 
+@property (strong, nonatomic) MJRefreshHeaderView *head;
 @property (strong, nonatomic) ChatModel *chatModel;
 
 @property (weak, nonatomic) IBOutlet UITableView *chatTableView;
@@ -30,6 +32,7 @@
     [super viewDidLoad];
     
     [self initBar];
+    [self addRefreshViews];
     [self loadBaseViewsAndData];
 }
 
@@ -51,57 +54,61 @@
 
 - (void)initBar
 {
-    self.title = @"ChatTableView";
+    UISegmentedControl *segment = [[UISegmentedControl alloc]initWithItems:@[@" private ",@" group "]];
+    [segment addTarget:self action:@selector(segmentChanged:) forControlEvents:UIControlEventValueChanged];
+    segment.selectedSegmentIndex = 0;
+    self.navigationItem.titleView = segment;
+    
     self.navigationController.navigationBar.tintColor = [UIColor grayColor];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:nil];
 }
+- (void)segmentChanged:(UISegmentedControl *)segment
+{
+    self.chatModel.isGroupChat = segment.selectedSegmentIndex;
+    [self.chatModel.dataSource removeAllObjects];
+    [self.chatModel populateRandomDataSource];
+    [self.chatTableView reloadData];
+}
 
-- (void)addRandomChatItems{
+- (void)addRefreshViews
+{
+    __weak typeof(self) weakSelf = self;
+    
+    //load more
     int pageNum = 3;
-    //wait a second, so that the indicator can be seen 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.chatModel addRandomItemsToDataSource:pageNum];
-        if (self.chatModel.dataSource.count>pageNum) {
+    
+    _head = [MJRefreshHeaderView header];
+    _head.scrollView = self.chatTableView;
+    _head.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
+        
+        [weakSelf.chatModel addRandomItemsToDataSource:pageNum];
+        
+        if (weakSelf.chatModel.dataSource.count > pageNum) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self.chatTableView reloadData];
-                [self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+                [weakSelf.chatTableView reloadData];
+                [weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
             });
         }
-    });
+        [weakSelf.head endRefreshing];
+    };
 }
 
 - (void)loadBaseViewsAndData
 {
-    self.chatTableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeOnDrag;
-    
     self.chatModel = [[ChatModel alloc]init];
+    self.chatModel.isGroupChat = NO;
     [self.chatModel populateRandomDataSource];
     
     IFView = [[UUInputFunctionView alloc]initWithSuperVC:self];
     IFView.delegate = self;
     [self.view addSubview:IFView];
     
-    [self loadRefreshIndicator];
-    
     [self.chatTableView reloadData];
     [self tableViewScrollToBottom];
 }
-
--(void)loadRefreshIndicator{
-    CGRect screenFrame = [[UIScreen mainScreen] bounds];
-    self.chatTableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenFrame.size.width, 44)];
-    CGRect indicatorFrame = self.chatTableView.frame;
-    UIActivityIndicatorView *refreshView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    indicatorFrame = refreshView.frame;
-    indicatorFrame.origin.x = screenFrame.size.width/2-indicatorFrame.size.width/2;
-    indicatorFrame.origin.y = self.chatTableView.tableHeaderView.frame.size.height/2-indicatorFrame.size.height/2;
-    refreshView.frame = indicatorFrame;
-    [refreshView startAnimating];
-    [self.chatTableView.tableHeaderView addSubview:refreshView];
-}
-
 
 -(void)keyboardChange:(NSNotification *)notification
 {
@@ -124,14 +131,14 @@
     }else{
         self.bottomConstraint.constant = 40;
     }
-
+    
     [self.view layoutIfNeeded];
     
     //adjust UUInputFunctionView's originPoint
     CGRect newFrame = IFView.frame;
     newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
     IFView.frame = newFrame;
-
+    
     [UIView commitAnimations];
     
 }
@@ -200,12 +207,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     [self.view endEditing:YES];
-}
-
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(indexPath.row == 0){
-        [self addRandomChatItems];
-    }
 }
 
 #pragma mark - cellDelegate

@@ -19,7 +19,7 @@
 }
 
 - (void)addRandomItemsToDataSource:(NSInteger)number{
-
+    
     for (int i=0; i<number; i++) {
         [self.dataSource insertObject:[[self additems:1] firstObject] atIndex:0];
     }
@@ -31,7 +31,7 @@
     UUMessageFrame *messageFrame = [[UUMessageFrame alloc]init];
     UUMessage *message = [[UUMessage alloc] init];
     NSMutableDictionary *dataDic = [NSMutableDictionary dictionaryWithDictionary:dic];
-  
+    
     NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/mingxing16.jpg";
     [dataDic setObject:@(UUMessageFromMe) forKey:@"from"];
     [dataDic setObject:[[NSDate date] description] forKey:@"strTime"];
@@ -90,9 +90,10 @@ static int dateNum = 10;
     [dictionary setObject:@(UUMessageFromOther) forKey:@"from"];
     [dictionary setObject:@(randomNum) forKey:@"type"];
     [dictionary setObject:[date description] forKey:@"strTime"];
-    // 这里随机匹配头像和名字
-    [dictionary setObject:[self getRandomName] forKey:@"strName"];
-    [dictionary setObject:[self getRandomImageStr] forKey:@"strIcon"];
+    // 这里判断是否是私人会话、群会话
+    int index = _isGroupChat ? arc4random()%6 : 0;
+    [dictionary setObject:[self getName:index] forKey:@"strName"];
+    [dictionary setObject:[self getImageStr:index] forKey:@"strIcon"];
     
     return dictionary;
 }
@@ -110,18 +111,18 @@ static int dateNum = 10;
     return [NSString stringWithFormat:@"%@!!", [lorumIpsumRandom componentsJoinedByString:@" "]];
 }
 
-- (NSString *)getRandomImageStr{
+- (NSString *)getImageStr:(NSInteger)index{
     NSArray *array = @[@"http://www.120ask.com/static/upload/clinic/article/org/201311/201311061651418413.jpg",
                        @"http://p1.qqyou.com/touxiang/uploadpic/2011-3/20113212244659712.jpg",
                        @"http://www.qqzhi.com/uploadpic/2014-09-14/004638238.jpg",
                        @"http://e.hiphotos.baidu.com/image/pic/item/5ab5c9ea15ce36d3b104443639f33a87e950b1b0.jpg",
                        @"http://ts1.mm.bing.net/th?&id=JN.C21iqVw9uSuD2ZyxElpacA&w=300&h=300&c=0&pid=1.9&rs=0&p=0",
                        @"http://ts1.mm.bing.net/th?&id=JN.7g7SEYKd2MTNono6zVirpA&w=300&h=300&c=0&pid=1.9&rs=0&p=0"];
-    return array[arc4random()%(array.count)];
+    return array[index];
 }
 
-- (NSString *)getRandomName{
+- (NSString *)getName:(NSInteger)index{
     NSArray *array = @[@"Hi,Daniel",@"Hi,Juey",@"Hey,Jobs",@"Hey,Bob",@"Hah,Dane",@"Wow,Boss"];
-    return array[arc4random()%(array.count)];
+    return array[index];
 }
 @end
