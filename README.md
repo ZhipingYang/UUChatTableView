@@ -9,7 +9,7 @@ Cocoa UI component for chat bubbles with text, images and audio support
 ## 截图 - ScreenShot
 ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-5.jpg) ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-4.jpg)
 #### 群聊（GroupChat）效果图（新添UI细节）
-![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/chat_3.jpg)   ![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/chat_2.jpg)
+![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/IMG_0052.jpg)  
 ##使用类介绍 - Introduce
 
 [类名](https://github.com/ZhipingYang/UUChatTableView/tree/master/UUChat) | 作用及用法
