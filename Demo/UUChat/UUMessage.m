@@ -47,6 +47,9 @@
 {
     NSString *subString = [Str substringWithRange:NSMakeRange(0, 19)];
     NSDate *lastDate = [NSDate dateFromString:subString withFormat:@"yyyy-MM-dd HH:mm:ss"];
+	NSTimeZone *zone = [NSTimeZone systemTimeZone];
+	NSInteger interval = [zone secondsFromGMTForDate:lastDate];
+	lastDate = [lastDate dateByAddingTimeInterval:interval];
     
     NSString *dateStr;  //年月日
     NSString *period;   //时间段
