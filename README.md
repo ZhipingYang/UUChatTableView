@@ -58,7 +58,7 @@ VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格
 
 
 #### Swift版
-UUChatSwift[链接](https://github.com/ZhipingYang/UUChatSwift)
+UUChatSwift  [链接地址](https://github.com/ZhipingYang/UUChatSwift)
 
 Swift版将完全使用autolayout，storyboard及xib。
 
