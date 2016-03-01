@@ -32,7 +32,7 @@
 
 @property (nonatomic, assign) BOOL isAbleToSendTextMessage;
 
-@property (nonatomic, retain) UIViewController *superVC;
+@property (nonatomic, assign) UIViewController *superVC;
 
 @property (nonatomic, assign) id<UUInputFunctionViewDelegate>delegate;
 
