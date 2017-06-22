@@ -8,10 +8,12 @@ Cocoa UI component for chat bubbles with text, images and audio support
 
 ## 截图 - ScreenShot
 ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-5.jpg) ![图片一](https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-4.jpg)
+
 ### 群聊（GroupChat）效果图（新添UI细节）
 ![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/IMG_0052.jpg)  
-![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/IMG_0054.jpg)  
-##使用类介绍 - Introduce
+![图片三](https://github.com/ZhipingYang/DataResource/raw/master/UUChat/IMG_0054.jpg) 
+
+## 使用类介绍 - Introduce
 
 [类名](https://github.com/ZhipingYang/UUChatTableView/tree/master/UUChat) | 作用及用法
 ----- | -----
@@ -30,7 +32,8 @@ Cocoa UI component for chat bubbles with text, images and audio support
 [AFNetworking](https://github.com/AFNetworking/AFNetworking) | 仅使用UIKit+AFNetworking，类似 [SDWebImage](https://github.com/rs/SDWebImage)
 VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格式转化成MP3
 
-##使用方法 - Usage
+## 使用方法 - Usage
+
 声明一下| 
 ----- | -----
 当前的数据是在固定模式下随机模拟的，不包含用户输入的所有可能性|
@@ -40,22 +43,24 @@ VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格
 感谢[丁南](https://github.com/ijinmao)修复语音播放及其他的一些bug|
 
 
-####添加代理
+#### 添加代理
  
-<h5 id="precode">UUInputFunctionViewDelegate</h5>
-	// 返回文字内容
-	- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message;
-	// 返回图片数据
-	- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image;
-	// 返回语音数据和录音时长
-	- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second;
-	
-<h5 id="precode">UUMessageCellDelegate</h5>
-	//cell的头像点击
-	- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId;
-	//图片点击可有可无
-	- (void)cellContentDidClick:(UUMessageCell *)cell image:(UIImage *)contentImage;
-
+UUInputFunctionViewDelegate
+```objc
+// 返回文字内容
+- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message;
+// 返回图片数据
+- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image;
+// 返回语音数据和录音时长
+- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second;
+```
+UUMessageCellDelegate
+```objc
+//cell的头像点击
+- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId;
+//图片点击可有可无
+- (void)cellContentDidClick:(UUMessageCell *)cell image:(UIImage *)contentImage;
+```
 
 #### Swift版
 [Code版](https://github.com/ZhipingYang/UUChatSwift)
