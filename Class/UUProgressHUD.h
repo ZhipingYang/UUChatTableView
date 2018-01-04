@@ -10,9 +10,6 @@
 
 @interface UUProgressHUD : UIView
 
-@property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) UILabel *subTitleLabel;
-
 + (void)show;
 
 + (void)dismissWithSuccess:(NSString *)str;
