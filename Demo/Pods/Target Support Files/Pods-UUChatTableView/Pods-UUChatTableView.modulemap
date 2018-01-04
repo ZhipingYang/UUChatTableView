@@ -1,0 +1,6 @@
+framework module Pods_UUChatTableView {
+  umbrella header "Pods-UUChatTableView-umbrella.h"
+
+  export *
+  module * { export * }
+}

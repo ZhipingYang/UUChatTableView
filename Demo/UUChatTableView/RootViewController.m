@@ -8,30 +8,26 @@
 
 #import "RootViewController.h"
 #import "UUInputFunctionView.h"
-#import "MJRefresh.h"
 #import "UUMessageCell.h"
 #import "ChatModel.h"
 #import "UUMessageFrame.h"
 #import "UUMessage.h"
+#import <MJRefresh/MJRefresh.h>
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 
-@property (strong, nonatomic) MJRefreshHeaderView *head;
 @property (strong, nonatomic) ChatModel *chatModel;
 
-@property (weak, nonatomic) IBOutlet UITableView *chatTableView;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
-
+@property (strong, nonatomic) UITableView *chatTableView;
+@property (strong, nonatomic) UUInputFunctionView *inputFuncView;
 @end
 
-@implementation RootViewController{
-    UUInputFunctionView *IFView;
-}
+@implementation RootViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self initBar];
+    [self initBasicViews];
     [self addRefreshViews];
     [self loadBaseViewsAndData];
 }
@@ -52,8 +48,17 @@
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
-- (void)initBar
+- (void)initBasicViews
 {
+	_chatTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-40) style:UITableViewStylePlain];
+	_chatTableView.delegate = self;
+	_chatTableView.dataSource = self;
+	[self.view addSubview:_chatTableView];
+	
+	_inputFuncView = [[UUInputFunctionView alloc] initWithSuperVC:self];
+	_inputFuncView.delegate = self;
+	[self.view addSubview:_inputFuncView];
+
     UISegmentedControl *segment = [[UISegmentedControl alloc]initWithItems:@[@" private ",@" group "]];
     [segment addTarget:self action:@selector(segmentChanged:) forControlEvents:UIControlEventValueChanged];
     segment.selectedSegmentIndex = 0;
@@ -77,35 +82,29 @@
     
     //load more
     int pageNum = 3;
-    
-    _head = [MJRefreshHeaderView header];
-    _head.scrollView = self.chatTableView;
-    _head.beginRefreshingBlock = ^(MJRefreshBaseView *refreshView) {
-        
-        [weakSelf.chatModel addRandomItemsToDataSource:pageNum];
-        
-        if (weakSelf.chatModel.dataSource.count > pageNum) {
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [weakSelf.chatTableView reloadData];
-                [weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
-            });
-        }
-        [weakSelf.head endRefreshing];
-    };
+	
+	self.chatTableView.mj_header = [MJRefreshHeader headerWithRefreshingBlock:^{
+		
+		[weakSelf.chatModel addRandomItemsToDataSource:pageNum];
+		
+		if (weakSelf.chatModel.dataSource.count > pageNum) {
+			NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageNum inSection:0];
+			
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[weakSelf.chatTableView reloadData];
+				[weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+			});
+		}
+//		[weakSelf.head endRefreshing];
+	}];
 }
 
 - (void)loadBaseViewsAndData
 {
-    self.chatModel = [[ChatModel alloc]init];
+    self.chatModel = [[ChatModel alloc] init];
     self.chatModel.isGroupChat = NO;
     [self.chatModel populateRandomDataSource];
-    
-    IFView = [[UUInputFunctionView alloc]initWithSuperVC:self];
-    IFView.delegate = self;
-    [self.view addSubview:IFView];
-    
+	
     [self.chatTableView reloadData];
     [self tableViewScrollToBottom];
 }
@@ -124,20 +123,22 @@
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
-    
+	
+	CGRect inputFrame = _inputFuncView.frame;
     //adjust ChatTableView's height
     if (notification.name == UIKeyboardWillShowNotification) {
-        self.bottomConstraint.constant = keyboardEndFrame.size.height+40;
-    }else{
-        self.bottomConstraint.constant = 40;
+		inputFrame.origin.y = self.view.frame.size.height-keyboardEndFrame.size.height-40;
+    } else {
+		inputFrame.origin.y = self.view.frame.size.height-40;
     }
-    
+	_inputFuncView.frame = inputFrame;
+	
     [self.view layoutIfNeeded];
     
     //adjust UUInputFunctionView's originPoint
-    CGRect newFrame = IFView.frame;
+    CGRect newFrame = _inputFuncView.frame;
     newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
-    IFView.frame = newFrame;
+    _inputFuncView.frame = newFrame;
     
     [UIView commitAnimations];
     
