@@ -7,6 +7,8 @@
 //
 
 #import "UUMessageContentButton.h"
+#import "UUChatCategory.h"
+
 @implementation UUMessageContentButton
 
 - (id)initWithFrame:(CGRect)frame
@@ -29,11 +31,11 @@
         self.second.textAlignment = NSTextAlignmentCenter;
         self.second.font = [UIFont systemFontOfSize:14];
         self.voice = [[UIImageView alloc]initWithFrame:CGRectMake(80, 5, 20, 20)];
-        self.voice.image = [UIImage imageNamed:@"UUChatTableView.bundle/image/chat_animation_white3"];
+        self.voice.image = [UIImage uu_imageWithName:@"chat_animation_white3"];
         self.voice.animationImages = [NSArray arrayWithObjects:
-                                      [UIImage imageNamed:@"UUChatTableView.bundle/image/chat_animation_white1"],
-                                      [UIImage imageNamed:@"UUChatTableView.bundle/image/chat_animation_white2"],
-                                      [UIImage imageNamed:@"UUChatTableView.bundle/image/chat_animation_white3"],nil];
+                                      [UIImage uu_imageWithName:@"chat_animation_white1"],
+                                      [UIImage uu_imageWithName:@"chat_animation_white2"],
+                                      [UIImage uu_imageWithName:@"chat_animation_white3"],nil];
         self.voice.animationDuration = 1;
         self.voice.animationRepeatCount = 0;
         self.indicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];

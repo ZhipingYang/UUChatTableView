@@ -8,9 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "UUMessageContentButton.h"
+
 @class UUMessageFrame;
 @class UUMessageCell;
-
 @protocol UUMessageCellDelegate <NSObject>
 @optional
 - (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId;
@@ -20,15 +20,15 @@
 
 @interface UUMessageCell : UITableViewCell
 
-@property (nonatomic, retain)UILabel *labelTime;
-@property (nonatomic, retain)UILabel *labelNum;
-@property (nonatomic, retain)UIButton *btnHeadImage;
+@property (nonatomic, strong) UILabel *labelTime;
+@property (nonatomic, strong) UILabel *labelNum;
+@property (nonatomic, strong) UIButton *btnHeadImage;
 
-@property (nonatomic, retain)UUMessageContentButton *btnContent;
+@property (nonatomic, strong) UUMessageContentButton *btnContent;
 
-@property (nonatomic, retain)UUMessageFrame *messageFrame;
+@property (nonatomic, strong) UUMessageFrame *messageFrame;
 
-@property (nonatomic, assign)id<UUMessageCellDelegate>delegate;
+@property (nonatomic, weak) id<UUMessageCellDelegate> delegate;
 
 @end
 

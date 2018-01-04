@@ -81,7 +81,7 @@ static int dateNum = 10;
     int randomNum = arc4random()%5;
     if (randomNum == UUMessageTypePicture) {
         [dictionary setObject:[UIImage imageNamed:[NSString stringWithFormat:@"%zd.jpeg",arc4random()%2]] forKey:@"picture"];
-    }else{
+    } else {
         // 文字出现概率4倍于图片（暂不出现Voice类型）
         randomNum = UUMessageTypeText;
         [dictionary setObject:[self getRandomString] forKey:@"strContent"];

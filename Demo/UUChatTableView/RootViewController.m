@@ -13,6 +13,7 @@
 #import "UUMessageFrame.h"
 #import "UUMessage.h"
 #import <MJRefresh/MJRefresh.h>
+#import "UUChatCategory.h"
 
 @interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
 
@@ -37,25 +38,34 @@
     [super viewDidAppear:animated];
     
     //add notification
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)viewDidLayoutSubviews
+{
+	[super viewDidLayoutSubviews];
+	_chatTableView.frame = CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40);
+	_inputFuncView.frame = CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40);
 }
 
 - (void)initBasicViews
 {
 	_chatTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-40) style:UITableViewStylePlain];
+	_chatTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+	_chatTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	_chatTableView.delegate = self;
 	_chatTableView.dataSource = self;
 	[self.view addSubview:_chatTableView];
 	
-	_inputFuncView = [[UUInputFunctionView alloc] initWithSuperVC:self];
+	_inputFuncView = [[UUInputFunctionView alloc] init];
 	_inputFuncView.delegate = self;
 	[self.view addSubview:_inputFuncView];
 
@@ -68,6 +78,7 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:nil];
 }
+
 - (void)segmentChanged:(UISegmentedControl *)segment
 {
     self.chatModel.isGroupChat = segment.selectedSegmentIndex;
@@ -95,7 +106,7 @@
 				[weakSelf.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
 			});
 		}
-//		[weakSelf.head endRefreshing];
+		[weakSelf.chatTableView.mj_header endRefreshing];
 	}];
 }
 
@@ -156,11 +167,12 @@
 
 
 #pragma mark - InputFunctionViewDelegate
+
 - (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message
 {
     NSDictionary *dic = @{@"strContent": message,
                           @"type": @(UUMessageTypeText)};
-    funcView.TextViewInput.text = @"";
+    funcView.textViewInput.text = @"";
     [funcView changeSendBtnWithPhoto:YES];
     [self dealTheFunctionData:dic];
 }

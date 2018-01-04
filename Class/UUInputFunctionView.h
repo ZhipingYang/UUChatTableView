@@ -28,16 +28,11 @@
 @property (nonatomic, retain) UIButton *btnSendMessage;
 @property (nonatomic, retain) UIButton *btnChangeVoiceState;
 @property (nonatomic, retain) UIButton *btnVoiceRecord;
-@property (nonatomic, retain) UITextView *TextViewInput;
+@property (nonatomic, retain) UITextView *textViewInput;
 
 @property (nonatomic, assign) BOOL isAbleToSendTextMessage;
 
-@property (nonatomic, assign) UIViewController *superVC;
-
 @property (nonatomic, assign) id<UUInputFunctionViewDelegate>delegate;
-
-
-- (id)initWithSuperVC:(UIViewController *)superVC;
 
 - (void)changeSendBtnWithPhoto:(BOOL)isPhoto;
 

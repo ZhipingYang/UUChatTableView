@@ -8,6 +8,7 @@
 
 #import "UUMessageFrame.h"
 #import "UUMessage.h"
+#import "UUChatCategory.h"
 
 @implementation UUMessageFrame
 
@@ -15,17 +16,16 @@
     
     _message = message;
     
-    CGFloat screenW = [UIScreen mainScreen].bounds.size.width;
+    CGFloat screenW = [UIScreen uu_screenWidth];
     
     // 1、计算时间的位置
     if (_showTime){
         CGFloat timeY = ChatMargin;
-        CGSize timeSize = [_message.strTime sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(300, 100) lineBreakMode:NSLineBreakByWordWrapping];
+		CGSize timeSize = [_message.strTime uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(300, 100)];
 
         CGFloat timeX = (screenW - timeSize.width) / 2;
         _timeF = CGRectMake(timeX, timeY, timeSize.width + ChatTimeMarginW, timeSize.height + ChatTimeMarginH);
     }
-    
     
     // 2、计算头像位置
     CGFloat iconX = ChatMargin;
@@ -46,8 +46,7 @@
     CGSize contentSize;
     switch (_message.type) {
         case UUMessageTypeText:
-            contentSize = [_message.strContent sizeWithFont:ChatContentFont  constrainedToSize:CGSizeMake(ChatContentW, CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping];
- 
+			contentSize = [_message.strContent uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(ChatContentW, CGFLOAT_MAX)];
             break;
         case UUMessageTypePicture:
             contentSize = CGSizeMake(ChatPicWH, ChatPicWH);
