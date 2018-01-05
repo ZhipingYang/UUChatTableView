@@ -28,9 +28,9 @@
 
 @implementation UUInputFunctionView
 
-- (id)init
+- (id)initWithFrame:(CGRect)frame
 {
-    self = [super init];
+    self = [super initWithFrame:frame];
 	
     if (self) {
 		NSDictionary *recordSetting = @{

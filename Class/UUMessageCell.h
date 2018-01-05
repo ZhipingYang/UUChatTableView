@@ -13,18 +13,11 @@
 @class UUMessageCell;
 @protocol UUMessageCellDelegate <NSObject>
 @optional
-- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId;
-- (void)cellContentDidClick:(UUMessageCell *)cell image:(UIImage *)contentImage;
+- (void)chatCell:(UUMessageCell *)cell headImageDidClick:(NSString *)userId;
 @end
 
 
 @interface UUMessageCell : UITableViewCell
-
-@property (nonatomic, strong) UILabel *labelTime;
-@property (nonatomic, strong) UILabel *labelNum;
-@property (nonatomic, strong) UIButton *btnHeadImage;
-
-@property (nonatomic, strong) UUMessageContentButton *btnContent;
 
 @property (nonatomic, strong) UUMessageFrame *messageFrame;
 

@@ -15,15 +15,21 @@
 #import <MJRefresh/MJRefresh.h>
 #import "UUChatCategory.h"
 
-@interface RootViewController ()<UUInputFunctionViewDelegate,UUMessageCellDelegate,UITableViewDataSource,UITableViewDelegate>
-
+@interface RootViewController ()<UUInputFunctionViewDelegate, UUMessageCellDelegate, UITableViewDataSource, UITableViewDelegate>
+{
+	CGFloat _keyboardHeight;
+}
 @property (strong, nonatomic) ChatModel *chatModel;
 
 @property (strong, nonatomic) UITableView *chatTableView;
+
 @property (strong, nonatomic) UUInputFunctionView *inputFuncView;
+
 @end
 
 @implementation RootViewController
+
+#pragma mark - life circle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,6 +37,8 @@
     [self initBasicViews];
     [self addRefreshViews];
     [self loadBaseViewsAndData];
+	_chatTableView.frame = CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40);
+	_inputFuncView.frame = CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40);
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -40,8 +48,8 @@
     //add notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(adjustCollectionViewLayout) name:UIDeviceOrientationDidChangeNotification object:nil];
+	[self tableViewScrollToBottom];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -53,39 +61,44 @@
 - (void)viewDidLayoutSubviews
 {
 	[super viewDidLayoutSubviews];
-	_chatTableView.frame = CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40);
-	_inputFuncView.frame = CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40);
+	
+	if (_inputFuncView.textViewInput.isFirstResponder) {
+		_chatTableView.frame = CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40-_keyboardHeight);
+		_inputFuncView.frame = CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40);
+	} else {
+		_chatTableView.frame = CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40);
+		_inputFuncView.frame = CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40);
+	}
 }
+
+#pragma mark - prive methods
 
 - (void)initBasicViews
 {
-	_chatTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height-40) style:UITableViewStylePlain];
+	_chatTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.uu_width, self.view.uu_height-40) style:UITableViewStylePlain];
 	_chatTableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	_chatTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	_chatTableView.delegate = self;
 	_chatTableView.dataSource = self;
 	[self.view addSubview:_chatTableView];
 	
-	_inputFuncView = [[UUInputFunctionView alloc] init];
+	[_chatTableView registerClass:[UUMessageCell class] forCellReuseIdentifier:NSStringFromClass([UUMessageCell class])];
+	
+	_inputFuncView = [[UUInputFunctionView alloc] initWithFrame:CGRectMake(0, _chatTableView.uu_bottom, self.view.uu_width, 40)];
+	_inputFuncView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
 	_inputFuncView.delegate = self;
 	[self.view addSubview:_inputFuncView];
-
-    UISegmentedControl *segment = [[UISegmentedControl alloc]initWithItems:@[@" private ",@" group "]];
+	
+	
+	
+    UISegmentedControl *segment = [[UISegmentedControl alloc] initWithItems:@[@" private ",@" group "]];
     [segment addTarget:self action:@selector(segmentChanged:) forControlEvents:UIControlEventValueChanged];
     segment.selectedSegmentIndex = 0;
     self.navigationItem.titleView = segment;
     
     self.navigationController.navigationBar.tintColor = [UIColor grayColor];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:self action:nil];
-}
-
-- (void)segmentChanged:(UISegmentedControl *)segment
-{
-    self.chatModel.isGroupChat = segment.selectedSegmentIndex;
-    [self.chatModel.dataSource removeAllObjects];
-    [self.chatModel populateRandomDataSource];
-    [self.chatTableView reloadData];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:nil action:nil];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSearch target:nil action:nil];
 }
 
 - (void)addRefreshViews
@@ -93,7 +106,7 @@
     __weak typeof(self) weakSelf = self;
     
     //load more
-    int pageNum = 3;
+    int pageNum = 10;
 	
 	self.chatTableView.mj_header = [MJRefreshHeader headerWithRefreshingBlock:^{
 		
@@ -118,7 +131,14 @@
     [self.chatModel populateRandomDataSource];
 	
     [self.chatTableView reloadData];
-    [self tableViewScrollToBottom];
+}
+
+- (void)segmentChanged:(UISegmentedControl *)segment
+{
+	self.chatModel.isGroupChat = segment.selectedSegmentIndex;
+	[self.chatModel.dataSource removeAllObjects];
+	[self.chatModel populateRandomDataSource];
+	[self.chatTableView reloadData];
 }
 
 #pragma mark - notification event
@@ -126,8 +146,7 @@
 //tableView Scroll to bottom
 - (void)tableViewScrollToBottom
 {
-	if (self.chatModel.dataSource.count==0)
-		return;
+	if (self.chatModel.dataSource.count==0) { return; }
 	
 	NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.chatModel.dataSource.count-1 inSection:0];
 	[self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
@@ -143,27 +162,19 @@
     [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
     [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
     [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-    
+	
+	_keyboardHeight = keyboardEndFrame.size.height;
+	
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
 	
-	CGRect inputFrame = _inputFuncView.frame;
-    //adjust ChatTableView's height
-    if (notification.name == UIKeyboardWillShowNotification) {
-		inputFrame.origin.y = self.view.frame.size.height-keyboardEndFrame.size.height-40;
-    } else {
-		inputFrame.origin.y = self.view.frame.size.height-40;
-    }
-	_inputFuncView.frame = inputFrame;
+	self.chatTableView.uu_height = self.view.uu_height - _inputFuncView.uu_height;
+	self.chatTableView.uu_height -= notification.name == UIKeyboardWillShowNotification ? _keyboardHeight:0;
+	self.chatTableView.contentOffset = CGPointMake(0, self.chatTableView.contentSize.height-self.chatTableView.uu_height);
+
+	self.inputFuncView.uu_top = self.chatTableView.uu_bottom;
 	
-    [self.view layoutIfNeeded];
-    
-    //adjust UUInputFunctionView's originPoint
-    CGRect newFrame = _inputFuncView.frame;
-    newFrame.origin.y = keyboardEndFrame.origin.y - newFrame.size.height;
-    _inputFuncView.frame = newFrame;
-    
     [UIView commitAnimations];
 }
 
@@ -203,39 +214,43 @@
 {
     [self.chatModel addSpecifiedItem:dic];
     [self.chatTableView reloadData];
-    [self tableViewScrollToBottom];
+	[self tableViewScrollToBottom];
 }
 
 #pragma mark - tableView delegate & datasource
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
     return self.chatModel.dataSource.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UUMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CellID"];
-    if (cell == nil) {
-        cell = [[UUMessageCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"CellID"];
-        cell.delegate = self;
-    }
-    [cell setMessageFrame:self.chatModel.dataSource[indexPath.row]];
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UUMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([UUMessageCell class])];
+	cell.delegate = self;
+	cell.messageFrame = self.chatModel.dataSource[indexPath.row];
     return cell;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
     return [self.chatModel.dataSource[indexPath.row] cellHeight];
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
     [self.view endEditing:YES];
 }
 
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
     [self.view endEditing:YES];
 }
 
-#pragma mark - cellDelegate
-- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId{
-    // headIamgeIcon is clicked
+#pragma mark - UUMessageCellDelegate
+
+- (void)chatCell:(UUMessageCell *)cell headImageDidClick:(NSString *)userId
+{
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle:cell.messageFrame.message.strName message:@"headImage clicked" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
     [alert show];
 }

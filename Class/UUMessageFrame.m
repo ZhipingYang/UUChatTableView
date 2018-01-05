@@ -31,7 +31,7 @@
     _iconF = CGRectMake(iconX, CGRectGetMaxY(_timeF) + ChatMargin, ChatIconWH, ChatIconWH);
     
     // 3、计算ID位置
-	CGSize nameSize = [_message.strName uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(ChatIconWH+ChatMargin, 100)];
+	CGSize nameSize = [_message.strName uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(ChatIconWH+ChatMargin, 50)];
     _nameF = CGRectMake(iconX-ChatMargin/2.0, CGRectGetMaxY(_iconF) + ChatMargin/2.0, ChatIconWH+ChatMargin, nameSize.height);
     
     // 4、计算内容位置
@@ -43,6 +43,7 @@
         case UUMessageTypeText:
 			contentSize = [_message.strContent uu_sizeWithFont:ChatContentFont constrainedToSize:CGSizeMake(MAX(ChatContentW, screenW*0.6), CGFLOAT_MAX)];
 			contentSize.height = MAX(contentSize.height, 30);
+			contentSize.width = MAX(contentSize.width, 40);
             break;
         case UUMessageTypePicture:
             contentSize = CGSizeMake(ChatPicWH, ChatPicWH);

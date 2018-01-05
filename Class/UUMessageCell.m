@@ -20,11 +20,18 @@
     NSString *_voiceURL;
     NSData *_songData;
     
-    UUAVAudioPlayer *audio;
+    UUAVAudioPlayer *_audio;
     
     UIView *_headImageBackView;
     BOOL _contentVoiceIsPlaying;
 }
+
+@property (nonatomic, strong) UILabel *dateLabel;
+@property (nonatomic, strong) UILabel *namelabel;
+@property (nonatomic, strong) UIButton *headImageButton;
+
+@property (nonatomic, strong) UUMessageContentButton *btnContent;
+
 @end
 
 @implementation UUMessageCell
@@ -38,11 +45,11 @@
         self.selectionStyle = UITableViewCellSelectionStyleNone;
 		
         // 1、创建时间
-        self.labelTime = [[UILabel alloc] init];
-        self.labelTime.textAlignment = NSTextAlignmentCenter;
-        self.labelTime.textColor = [UIColor grayColor];
-        self.labelTime.font = ChatTimeFont;
-        [self.contentView addSubview:self.labelTime];
+        self.dateLabel = [[UILabel alloc] init];
+        self.dateLabel.textAlignment = NSTextAlignmentCenter;
+        self.dateLabel.textColor = [UIColor grayColor];
+        self.dateLabel.font = ChatTimeFont;
+        [self.contentView addSubview:self.dateLabel];
         
         // 2、创建头像
         _headImageBackView = [[UIView alloc]init];
@@ -50,18 +57,19 @@
         _headImageBackView.layer.masksToBounds = YES;
         _headImageBackView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.4];
         [self.contentView addSubview:_headImageBackView];
-        self.btnHeadImage = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.btnHeadImage.layer.cornerRadius = 20;
-        self.btnHeadImage.layer.masksToBounds = YES;
-        [self.btnHeadImage addTarget:self action:@selector(btnHeadImageClick:)  forControlEvents:UIControlEventTouchUpInside];
-        [_headImageBackView addSubview:self.btnHeadImage];
+        self.headImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        self.headImageButton.layer.cornerRadius = 20;
+        self.headImageButton.layer.masksToBounds = YES;
+        [self.headImageButton addTarget:self action:@selector(btnHeadImageClick:)  forControlEvents:UIControlEventTouchUpInside];
+        [_headImageBackView addSubview:self.headImageButton];
         
         // 3、创建头像下标
-        self.labelNum = [[UILabel alloc] init];
-        self.labelNum.textColor = [UIColor grayColor];
-        self.labelNum.textAlignment = NSTextAlignmentCenter;
-        self.labelNum.font = ChatTimeFont;
-        [self.contentView addSubview:self.labelNum];
+        self.namelabel = [[UILabel alloc] init];
+        self.namelabel.textColor = [UIColor grayColor];
+        self.namelabel.textAlignment = NSTextAlignmentCenter;
+        self.namelabel.font = ChatTimeFont;
+		self.namelabel.numberOfLines = 0;
+        [self.contentView addSubview:self.namelabel];
         
         // 4、创建内容
         self.btnContent = [UUMessageContentButton buttonWithType:UIButtonTypeCustom];
@@ -84,13 +92,18 @@
     return self;
 }
 
-//头像点击
-- (void)btnHeadImageClick:(UIButton *)button{
-    if ([self.delegate respondsToSelector:@selector(headImageDidClick:userId:)])  {
-        [self.delegate headImageDidClick:self userId:self.messageFrame.message.strId];
-    }
+- (void)prepareForReuse
+{
+	[super prepareForReuse];
+	
 }
 
+//头像点击
+- (void)btnHeadImageClick:(UIButton *)button{
+    if ([self.delegate respondsToSelector:@selector(chatCell:headImageDidClick:)])  {
+        [self.delegate chatCell:self headImageDidClick:self.messageFrame.message.strId];
+    }
+}
 
 - (void)btnContentClick{
     //play audio
@@ -98,10 +111,10 @@
         if(!_contentVoiceIsPlaying){
             [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
             _contentVoiceIsPlaying = YES;
-            audio = [UUAVAudioPlayer sharedInstance];
-            audio.delegate = self;
-            //        [audio playSongWithUrl:_voiceURL];
-            [audio playSongWithData:_songData];
+            _audio = [UUAVAudioPlayer sharedInstance];
+            _audio.delegate = self;
+            //        [_audio playSongWithUrl:_voiceURL];
+            [_audio playSongWithData:_songData];
         }else{
             [self UUAVAudioPlayerDidFinishPlay];
         }
@@ -130,12 +143,14 @@
 {
     [self.btnContent benginLoadVoice];
 }
+
 - (void)UUAVAudioPlayerBeiginPlay
 {
     //开启红外线感应
     [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
     [self.btnContent didLoadVoice];
 }
+
 - (void)UUAVAudioPlayerDidFinishPlay
 {
     //关闭红外线感应
@@ -145,31 +160,28 @@
     [[UUAVAudioPlayer sharedInstance]stopSound];
 }
 
-
 //内容及Frame设置
-- (void)setMessageFrame:(UUMessageFrame *)messageFrame{
-
+- (void)setMessageFrame:(UUMessageFrame *)messageFrame
+{
     _messageFrame = messageFrame;
     UUMessage *message = messageFrame.message;
     
     // 1、设置时间
-    self.labelTime.text = message.strTime;
-    self.labelTime.frame = messageFrame.timeF;
+    self.dateLabel.text = message.strTime;
+    self.dateLabel.frame = messageFrame.timeF;
     
     // 2、设置头像
     _headImageBackView.frame = messageFrame.iconF;
-    self.btnHeadImage.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
-    [self.btnHeadImage setBackgroundImageForState:UIControlStateNormal
+    self.headImageButton.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
+    [self.headImageButton setBackgroundImageForState:UIControlStateNormal
                                           withURL:[NSURL URLWithString:message.strIcon]
                                  placeholderImage:[UIImage uu_imageWithName:@"headImage.jpeg"]];
     
     // 3、设置下标
-    self.labelNum.text = message.strName;
-	self.labelNum.frame = messageFrame.nameF;
+    self.namelabel.text = message.strName;
+	self.namelabel.frame = messageFrame.nameF;
 	
     // 4、设置内容
-    
-    //prepare for reuse
     [self.btnContent setTitle:@"" forState:UIControlStateNormal];
     self.btnContent.voiceBackView.hidden = YES;
     self.btnContent.backImageView.hidden = YES;
@@ -198,7 +210,7 @@
     }
     [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
     [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
-
+	
     switch (message.type) {
         case UUMessageTypeText:
             [self.btnContent setTitle:message.strContent forState:UIControlStateNormal];
