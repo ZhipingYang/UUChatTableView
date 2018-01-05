@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 
+@class UUMessageFrame;
 @interface ChatModel : NSObject
 
-@property (nonatomic, strong) NSMutableArray *dataSource;
+@property (nonatomic, strong) NSMutableArray<UUMessageFrame *> *dataSource;
 
 @property (nonatomic) BOOL isGroupChat;
 
@@ -19,5 +20,7 @@
 - (void)addRandomItemsToDataSource:(NSInteger)number;
 
 - (void)addSpecifiedItem:(NSDictionary *)dic;
+
+- (void)recountFrame;
 
 @end

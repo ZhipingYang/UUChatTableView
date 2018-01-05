@@ -191,6 +191,14 @@
 
 @implementation NSString(UUChatCategory)
 
+- (CGSize)uu_sizeWithFont:(UIFont *)font
+{
+	CGSize result = [self sizeWithAttributes:[NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil]];
+	result.height = ceilf(result.height);
+	result.width = ceilf(result.width);
+	return result;
+}
+
 - (CGSize)uu_sizeWithFont:(UIFont *)font constrainedToSize:(CGSize)size
 {
 	CGSize result = [self boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading attributes:[NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, nil] context:nil].size;

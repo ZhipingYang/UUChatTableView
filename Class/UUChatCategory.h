@@ -68,6 +68,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString(UUChatCategory)
 
+- (CGSize)uu_sizeWithFont:(UIFont *)font;
+
 - (CGSize)uu_sizeWithFont:(UIFont *)font constrainedToSize:(CGSize)size;
 
 @end

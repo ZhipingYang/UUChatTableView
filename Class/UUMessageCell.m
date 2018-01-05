@@ -165,31 +165,25 @@
     
     // 3、设置下标
     self.labelNum.text = message.strName;
-    if (messageFrame.nameF.origin.x > 160) {
-        self.labelNum.frame = CGRectMake(messageFrame.nameF.origin.x - 50, messageFrame.nameF.origin.y + 3, 100, messageFrame.nameF.size.height);
-        self.labelNum.textAlignment = NSTextAlignmentRight;
-    }else{
-        self.labelNum.frame = CGRectMake(messageFrame.nameF.origin.x, messageFrame.nameF.origin.y + 3, 80, messageFrame.nameF.size.height);
-        self.labelNum.textAlignment = NSTextAlignmentLeft;
-    }
-
+	self.labelNum.frame = messageFrame.nameF;
+	
     // 4、设置内容
     
     //prepare for reuse
     [self.btnContent setTitle:@"" forState:UIControlStateNormal];
     self.btnContent.voiceBackView.hidden = YES;
     self.btnContent.backImageView.hidden = YES;
-
+	
     self.btnContent.frame = messageFrame.contentF;
     
     if (message.from == UUMessageFromMe) {
         self.btnContent.isMyMessage = YES;
         [self.btnContent setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.btnContent.contentEdgeInsets = UIEdgeInsetsMake(ChatContentTop, ChatContentRight, ChatContentBottom, ChatContentLeft);
-    }else{
+        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentSmaller, ChatContentTopBottom, ChatContentBiger);
+    } else {
         self.btnContent.isMyMessage = NO;
         [self.btnContent setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
-        self.btnContent.contentEdgeInsets = UIEdgeInsetsMake(ChatContentTop, ChatContentLeft, ChatContentBottom, ChatContentRight);
+        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentBiger, ChatContentTopBottom, ChatContentSmaller);
     }
     
     //背景气泡图

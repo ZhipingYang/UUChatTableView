@@ -76,7 +76,7 @@
     }else if ([lastDate hour]>18 && [lastDate hour]<=23){
         period = @"Night";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]-12];
-    }else{
+    } else {
         period = @"Dawn";
         hour = [NSString stringWithFormat:@"%02d",(int)[lastDate hour]];
     }

@@ -16,37 +16,33 @@
     
     _message = message;
     
-    CGFloat screenW = [UIScreen uu_screenWidth];
+    CGFloat const screenW = [UIScreen uu_screenWidth];
     
     // 1、计算时间的位置
     if (_showTime){
-        CGFloat timeY = ChatMargin;
 		CGSize timeSize = [_message.strTime uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(300, 100)];
-
-        CGFloat timeX = (screenW - timeSize.width) / 2;
-        _timeF = CGRectMake(timeX, timeY, timeSize.width + ChatTimeMarginW, timeSize.height + ChatTimeMarginH);
-    }
+        _timeF = CGRectMake((screenW - timeSize.width) / 2, ChatMargin, timeSize.width, timeSize.height);
+    } else {
+		_timeF = CGRectZero;
+	}
     
     // 2、计算头像位置
-    CGFloat iconX = ChatMargin;
-    if (_message.from == UUMessageFromMe) {
-        iconX = screenW - ChatMargin - ChatIconWH;
-    }
-    CGFloat iconY = CGRectGetMaxY(_timeF) + ChatMargin;
-    _iconF = CGRectMake(iconX, iconY, ChatIconWH, ChatIconWH);
+	CGFloat const iconX = _message.from == UUMessageFromOther ? ChatMargin : (screenW - ChatMargin - ChatIconWH);
+    _iconF = CGRectMake(iconX, CGRectGetMaxY(_timeF) + ChatMargin, ChatIconWH, ChatIconWH);
     
     // 3、计算ID位置
-    _nameF = CGRectMake(iconX, iconY+ChatIconWH, ChatIconWH, 20);
+	CGSize nameSize = [_message.strName uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(ChatIconWH+ChatMargin, 100)];
+    _nameF = CGRectMake(iconX-ChatMargin/2.0, CGRectGetMaxY(_iconF) + ChatMargin/2.0, ChatIconWH+ChatMargin, nameSize.height);
     
     // 4、计算内容位置
-    CGFloat contentX = CGRectGetMaxX(_iconF)+ChatMargin;
-    CGFloat contentY = iconY;
+    CGFloat contentX = CGRectGetMaxX(_iconF) + ChatMargin;
    
     //根据种类分
     CGSize contentSize;
     switch (_message.type) {
         case UUMessageTypeText:
-			contentSize = [_message.strContent uu_sizeWithFont:ChatTimeFont constrainedToSize:CGSizeMake(ChatContentW, CGFLOAT_MAX)];
+			contentSize = [_message.strContent uu_sizeWithFont:ChatContentFont constrainedToSize:CGSizeMake(MAX(ChatContentW, screenW*0.6), CGFLOAT_MAX)];
+			contentSize.height = MAX(contentSize.height, 30);
             break;
         case UUMessageTypePicture:
             contentSize = CGSizeMake(ChatPicWH, ChatPicWH);
@@ -58,12 +54,20 @@
             break;
     }
     if (_message.from == UUMessageFromMe) {
-        contentX = iconX - contentSize.width - ChatContentLeft - ChatContentRight - ChatMargin;
+        contentX = screenW - (contentSize.width + ChatContentBiger + ChatContentSmaller + ChatMargin + ChatIconWH + ChatMargin);
     }
-    _contentF = CGRectMake(contentX, contentY, contentSize.width + ChatContentLeft + ChatContentRight, contentSize.height + ChatContentTop + ChatContentBottom);
+    _contentF = CGRectMake(contentX, CGRectGetMinY(_iconF) + 5, contentSize.width + ChatContentBiger + ChatContentSmaller, contentSize.height + ChatContentTopBottom * 2);
     
     _cellHeight = MAX(CGRectGetMaxY(_contentF), CGRectGetMaxY(_nameF))  + ChatMargin;
-    
+}
+
+- (void)setShowTime:(BOOL)showTime
+{
+	_showTime = showTime;
+	
+	if (_message) {
+		self.message = _message;
+	}
 }
 
 @end

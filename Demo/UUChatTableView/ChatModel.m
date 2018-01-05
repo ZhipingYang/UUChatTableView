@@ -25,6 +25,13 @@
     }
 }
 
+- (void)recountFrame
+{
+	[self.dataSource enumerateObjectsUsingBlock:^(UUMessageFrame * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+		obj.message = obj.message;
+	}];
+}
+
 // 添加自己的item
 - (void)addSpecifiedItem:(NSDictionary *)dic
 {
@@ -35,7 +42,7 @@
     NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/mingxing16.jpg";
     [dataDic setObject:@(UUMessageFromMe) forKey:@"from"];
     [dataDic setObject:[[NSDate date] description] forKey:@"strTime"];
-    [dataDic setObject:@"Hello,Sister" forKey:@"strName"];
+	[dataDic setObject:@"Hi:sister" forKey:@"strName"];
     [dataDic setObject:URLStr forKey:@"strIcon"];
     
     [message setWithDict:dataDic];
@@ -51,9 +58,9 @@
 
 // 添加聊天item（一个cell内容）
 static NSString *previousTime = nil;
-- (NSArray *)additems:(NSInteger)number
+- (NSArray<UUMessageFrame *> *)additems:(NSInteger)number
 {
-    NSMutableArray *result = [NSMutableArray array];
+    NSMutableArray<UUMessageFrame *> *result = [NSMutableArray array];
     
     for (int i=0; i<number; i++) {
         

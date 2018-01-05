@@ -40,7 +40,8 @@
     //add notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardChange:) name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tableViewScrollToBottom) name:UIKeyboardDidShowNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(adjustCollectionViewLayout) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -120,6 +121,18 @@
     [self tableViewScrollToBottom];
 }
 
+#pragma mark - notification event
+
+//tableView Scroll to bottom
+- (void)tableViewScrollToBottom
+{
+	if (self.chatModel.dataSource.count==0)
+		return;
+	
+	NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.chatModel.dataSource.count-1 inSection:0];
+	[self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
 -(void)keyboardChange:(NSNotification *)notification
 {
     NSDictionary *userInfo = [notification userInfo];
@@ -152,19 +165,13 @@
     _inputFuncView.frame = newFrame;
     
     [UIView commitAnimations];
-    
 }
 
-//tableView Scroll to bottom
-- (void)tableViewScrollToBottom
+- (void)adjustCollectionViewLayout
 {
-    if (self.chatModel.dataSource.count==0)
-        return;
-    
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.chatModel.dataSource.count-1 inSection:0];
-    [self.chatTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+	[self.chatModel recountFrame];
+	[self.chatTableView reloadData];
 }
-
 
 #pragma mark - InputFunctionViewDelegate
 
