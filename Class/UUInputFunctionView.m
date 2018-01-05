@@ -11,10 +11,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import "UUChatCategory.h"
 
-@interface UUInputFunctionView () <UITextViewDelegate>
+@interface UUInputFunctionView () <UITextViewDelegate, AVAudioRecorderDelegate>
 {
     BOOL isbeginVoiceRecord;
     NSInteger playTime;
+	NSString *_docmentFilePath;
 }
 
 @property (nonatomic, strong) NSTimer *playTimer;
@@ -33,16 +34,6 @@
     self = [super initWithFrame:frame];
 	
     if (self) {
-		NSDictionary *recordSetting = @{
-										AVEncoderAudioQualityKey:[NSNumber numberWithInt:AVAudioQualityMin],
-										AVEncoderBitRateKey:[NSNumber numberWithInt:16],
-										AVFormatIDKey:[NSNumber numberWithInt:kAudioFormatMPEGLayer3]
-										};
-		NSError *error = nil;
-		NSURL *pathURL = [NSURL fileURLWithPath:NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject];
-		_recorder = [[AVAudioRecorder alloc] initWithURL:pathURL settings:recordSetting error:&error];
-		[_recorder prepareToRecord];
-		
 		self.backgroundColor = [UIColor whiteColor];
 		self.isAbleToSendTextMessage = NO;
 
@@ -120,6 +111,48 @@
 #pragma mark - 录音touch事件
 - (void)beginRecordVoice:(UIButton *)button
 {
+	AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+	NSError *err = nil;
+	[audioSession setCategory :AVAudioSessionCategoryRecord error:&err];
+	if (err) {
+		NSLog(@"audioSession: %@ %zd %@", [err domain], [err code], [[err userInfo] description]);
+		return;
+	}
+	[audioSession setActive:YES error:&err];
+	if (err) {
+		NSLog(@"audioSession: %@ %zd %@", [err domain], [err code], [[err userInfo] description]);
+		return;
+	}
+
+	
+	NSDictionary *recordSetting = @{
+									AVEncoderAudioQualityKey : [NSNumber numberWithInt:AVAudioQualityMin],
+									AVEncoderBitRateKey : [NSNumber numberWithInt:16],
+									AVFormatIDKey : [NSNumber numberWithInt:kAudioFormatLinearPCM],
+									AVNumberOfChannelsKey : @2,
+									AVLinearPCMBitDepthKey : @8
+									};
+	NSError *error = nil;
+//	NSString *docments = [NSHomeDirectory() stringByAppendingString:@"Documents"];
+	NSString *docments = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+	_docmentFilePath = [NSString stringWithFormat:@"%@/%@",docments,@"123"];
+	
+	NSURL *pathURL = [NSURL fileURLWithPath:_docmentFilePath];
+	_recorder = [[AVAudioRecorder alloc] initWithURL:pathURL settings:recordSetting error:&error];
+	if (error || !_recorder) {
+		NSLog(@"recorder: %@ %zd %@", [error domain], [error code], [[error userInfo] description]);
+		return;
+	}
+	_recorder.delegate = self;
+	[_recorder prepareToRecord];
+	_recorder.meteringEnabled = YES;
+	
+	if (!audioSession.inputIsAvailable) {
+		
+		return;
+	}
+	
+	
     [_recorder record];
     playTime = 0;
     _playTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(countVoiceTime) userInfo:nil repeats:YES];
@@ -128,11 +161,9 @@
 
 - (void)endRecordVoice:(UIButton *)button
 {
-    if (_playTimer) {
-        [_recorder stop];
-        [_playTimer invalidate];
-        _playTimer = nil;
-    }
+	[_recorder stop];
+	[_playTimer invalidate];
+	_playTimer = nil;
 }
 
 - (void)cancelRecordVoice:(UIButton *)button
@@ -298,6 +329,23 @@
 
 -(void)dealloc{
     [[NSNotificationCenter defaultCenter]removeObserver:self];
+}
+
+#pragma mark - AVAudioRecorderDelegate
+
+- (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)recorder successfully:(BOOL)flag
+{
+	NSURL *url = [NSURL fileURLWithPath:_docmentFilePath];
+	NSError *err = nil;
+	NSData *audioData = [NSData dataWithContentsOfFile:[url path] options:0 error:&err];
+	if (audioData) {
+		[self endConvertWithData:audioData];
+	}
+}
+
+- (void)audioRecorderEncodeErrorDidOccur:(AVAudioRecorder *)recorder error:(NSError *)error
+{
+	
 }
 
 @end

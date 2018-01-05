@@ -49,7 +49,7 @@
             contentSize = CGSizeMake(ChatPicWH, ChatPicWH);
             break;
         case UUMessageTypeVoice:
-            contentSize = CGSizeMake(120, 20);
+            contentSize = CGSizeMake(120, 35);
             break;
         default:
             break;
