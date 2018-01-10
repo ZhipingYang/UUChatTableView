@@ -9,36 +9,32 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger, MessageType) {
-    UUMessageTypeText     = 0 , // 文字
-    UUMessageTypePicture  = 1 , // 图片
-    UUMessageTypeVoice    = 2   // 语音
+    UUMessageTypeText = 0 , 	// 文字
+    UUMessageTypePicture = 1 , 	// 图片
+    UUMessageTypeVoice = 2   	// 语音
 };
 
 typedef NS_ENUM(NSInteger, MessageFrom) {
-    UUMessageFromMe    = 0,   // 自己发的
-    UUMessageFromOther = 1    // 别人发得
+    UUMessageFromMe = 0,   	// 自己发的
+    UUMessageFromOther = 1 	// 别人发得
 };
 
+NS_ASSUME_NONNULL_BEGIN
 
-@interface UUMessage : NSObject
+@protocol UUMessage <NSObject>
 
-@property (nonatomic, copy) NSString *strIcon;
-@property (nonatomic, copy) NSString *strId;
-@property (nonatomic, copy) NSString *strTime;
-@property (nonatomic, copy) NSString *strName;
+@property (nonatomic, readonly) NSString *nickName;
+@property (nonatomic, readonly, nullable) UIImage *avatar;
+@property (nonatomic, readonly, nullable) NSString *date;
 
-@property (nonatomic, copy) NSString *strContent;
-@property (nonatomic, copy) UIImage  *picture;
-@property (nonatomic, copy) NSData   *voice;
-@property (nonatomic, copy) NSString *strVoiceTime;
+@property (nonatomic, readonly, nullable) NSString *text;
+@property (nonatomic, readonly, nullable) UIImage *image;
+@property (nonatomic, readonly, nullable) NSData *voiceData;
+@property (nonatomic, readonly, nullable) NSString *voiceText;
 
-@property (nonatomic, assign) MessageType type;
-@property (nonatomic, assign) MessageFrom from;
-
-@property (nonatomic, assign) BOOL showDateLabel;
-
-- (void)setWithDict:(NSDictionary *)dict;
-
-- (void)minuteOffSetStart:(NSString *)start end:(NSString *)end;
+@property (nonatomic, readonly) MessageType type;
+@property (nonatomic, readonly) MessageFrom from;
 
 @end
+
+NS_ASSUME_NONNULL_END

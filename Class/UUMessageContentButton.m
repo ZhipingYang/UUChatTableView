@@ -8,6 +8,7 @@
 
 #import "UUMessageContentButton.h"
 #import "UUChatCategory.h"
+#import "UUMessageFrame.h"
 
 @implementation UUMessageContentButton
 
@@ -74,19 +75,64 @@
 //    }
 }
 
-- (void)setIsMyMessage:(BOOL)isMyMessage
+- (void)setMessageFrame:(UUMessageFrame *)messageFrame
 {
-    _isMyMessage = isMyMessage;
-    if (isMyMessage) {
-        self.backImageView.frame = CGRectMake(5, 5, 220, 220);
-        self.voiceBackView.frame = CGRectMake(15, 10, 130, 35);
-        self.second.textColor = [UIColor whiteColor];
-    }else{
-        self.backImageView.frame = CGRectMake(15, 5, 220, 220);
-        self.voiceBackView.frame = CGRectMake(25, 10, 130, 35);
-        self.second.textColor = [UIColor grayColor];
-    }
+	_messageFrame = messageFrame;
+	
+	self.frame = messageFrame.contentFrame;
+	BOOL isMyMessage = messageFrame.message.from == UUMessageFromMe;
+	
+	self.second.textColor = isMyMessage ? [UIColor whiteColor] : [UIColor grayColor];
+	self.voiceBackView.frame = CGRectMake(isMyMessage ? 15:25, 10, 130, 35);
+	[self setTitleColor:isMyMessage ? [UIColor whiteColor]:[UIColor grayColor] forState:UIControlStateNormal];
+	
+	//背景气泡图
+	UIImage *backImage = [UIImage uu_imageWithName:isMyMessage ? @"chatto_bg_normal" : @"chatfrom_bg_normal"];
+	if (isMyMessage) {
+		self.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentSmaller, ChatContentTopBottom, ChatContentBiger);
+		backImage = [backImage resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
+	} else {
+		self.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentBiger, ChatContentTopBottom, ChatContentSmaller);
+		backImage = [backImage resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
+	}
+	[self setBackgroundImage:backImage forState:UIControlStateNormal];
+	[self setBackgroundImage:backImage forState:UIControlStateHighlighted];
+
+	
+	switch (messageFrame.message.type) {
+		case UUMessageTypeText:
+			[self setTitle:messageFrame.message.text forState:UIControlStateNormal];
+			break;
+		case UUMessageTypePicture:
+		{
+			self.backImageView.hidden = NO;
+			self.backImageView.image = messageFrame.message.image;
+			self.backImageView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+			[self makeMaskView:self.backImageView withImage:backImage];
+		}
+			break;
+		case UUMessageTypeVoice:
+		{
+			self.voiceBackView.hidden = NO;
+			self.second.text = messageFrame.message.voiceText;
+//			_songData = messageFrame.message.voiceData;
+//			_voiceURL = [NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strVoice];
+		}
+			break;
+			
+		default:
+			break;
+	}
+
 }
+
+- (void)makeMaskView:(UIView *)view withImage:(UIImage *)image
+{
+	UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
+	imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
+	view.layer.mask = imageViewMask.layer;
+}
+
 //添加
 - (BOOL)canBecomeFirstResponder
 {

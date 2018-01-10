@@ -108,7 +108,7 @@
     //load more
     int pageNum = 10;
 	
-	self.chatTableView.mj_header = [MJRefreshHeader headerWithRefreshingBlock:^{
+	self.chatTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
 		
 		[weakSelf.chatModel addRandomItemsToDataSource:pageNum];
 		
@@ -251,7 +251,7 @@
 
 - (void)chatCell:(UUMessageCell *)cell headImageDidClick:(NSString *)userId
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:cell.messageFrame.message.strName message:@"headImage clicked" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:cell.messageFrame.message.nickName message:@"headImage clicked" delegate:nil cancelButtonTitle:@"sure" otherButtonTitles:nil];
     [alert show];
 }
 

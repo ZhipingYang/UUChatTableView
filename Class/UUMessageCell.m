@@ -7,13 +7,13 @@
 //
 
 #import "UUMessageCell.h"
-#import "UUMessage.h"
 #import "UUMessageFrame.h"
 #import "UUAVAudioPlayer.h"
 #import "UIImageView+AFNetworking.h"
 #import "UIButton+AFNetworking.h"
 #import "UUImageAvatarBrowser.h"
 #import "UUChatCategory.h"
+#import "UUMessageContentButton.h"
 
 @interface UUMessageCell ()<UUAVAudioPlayerDelegate>
 {
@@ -57,11 +57,12 @@
         _headImageBackView.layer.masksToBounds = YES;
         _headImageBackView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.4];
         [self.contentView addSubview:_headImageBackView];
+		
         self.headImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
         self.headImageButton.layer.cornerRadius = 20;
         self.headImageButton.layer.masksToBounds = YES;
         [self.headImageButton addTarget:self action:@selector(btnHeadImageClick:)  forControlEvents:UIControlEventTouchUpInside];
-        [_headImageBackView addSubview:self.headImageButton];
+        [self.contentView addSubview:self.headImageButton];
         
         // 3、创建头像下标
         self.namelabel = [[UILabel alloc] init];
@@ -95,33 +96,36 @@
 - (void)prepareForReuse
 {
 	[super prepareForReuse];
-	
+	// 清空内容
+	[self.btnContent setTitle:@"" forState:UIControlStateNormal];
+	self.btnContent.voiceBackView.hidden = YES;
+	self.btnContent.backImageView.hidden = YES;
+
 }
 
 //头像点击
-- (void)btnHeadImageClick:(UIButton *)button{
+- (void)btnHeadImageClick:(UIButton *)button {
     if ([self.delegate respondsToSelector:@selector(chatCell:headImageDidClick:)])  {
-        [self.delegate chatCell:self headImageDidClick:self.messageFrame.message.strId];
+        [self.delegate chatCell:self headImageDidClick:self.messageFrame.message];
     }
 }
 
-- (void)btnContentClick{
+- (void)btnContentClick {
     //play audio
     if (self.messageFrame.message.type == UUMessageTypeVoice) {
-        if(!_contentVoiceIsPlaying){
+        if (!_contentVoiceIsPlaying) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
             _contentVoiceIsPlaying = YES;
             _audio = [UUAVAudioPlayer sharedInstance];
             _audio.delegate = self;
-            //        [_audio playSongWithUrl:_voiceURL];
+//			[_audio playSongWithUrl:_voiceURL];
             [_audio playSongWithData:_songData];
         }else{
             [self UUAVAudioPlayerDidFinishPlay];
         }
     }
     //show the picture
-    else if (self.messageFrame.message.type == UUMessageTypePicture)
-    {
+    else if (self.messageFrame.message.type == UUMessageTypePicture) {
         if (self.btnContent.backImageView) {
             [UUImageAvatarBrowser showImage:self.btnContent.backImageView];
         }
@@ -130,8 +134,7 @@
         }
     }
     // show text and gonna copy that
-    else if (self.messageFrame.message.type == UUMessageTypeText)
-    {
+    else if (self.messageFrame.message.type == UUMessageTypeText) {
         [self.btnContent becomeFirstResponder];
         UIMenuController *menu = [UIMenuController sharedMenuController];
         [menu setTargetRect:self.btnContent.frame inView:self.btnContent.superview];
@@ -164,84 +167,26 @@
 - (void)setMessageFrame:(UUMessageFrame *)messageFrame
 {
     _messageFrame = messageFrame;
-    UUMessage *message = messageFrame.message;
-    
+	id <UUMessage> message = messageFrame.message;
     // 1、设置时间
-    self.dateLabel.text = message.strTime;
-    self.dateLabel.frame = messageFrame.timeF;
+    self.dateLabel.text = message.date;
+    self.dateLabel.frame = messageFrame.timeFrame;
     
     // 2、设置头像
-    _headImageBackView.frame = messageFrame.iconF;
-    self.headImageButton.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
-    [self.headImageButton setBackgroundImageForState:UIControlStateNormal
-                                          withURL:[NSURL URLWithString:message.strIcon]
-                                 placeholderImage:[UIImage uu_imageWithName:@"headImage.jpeg"]];
-    
+    _headImageBackView.frame = messageFrame.iconFrame;
+    self.headImageButton.frame = CGRectInset(messageFrame.iconFrame, 2, 2);
+	[self.headImageButton setBackgroundImage:message.avatar ?: [UIImage uu_imageWithName:@"headImage.jpeg"] forState:UIControlStateNormal];
+	
     // 3、设置下标
-    self.namelabel.text = message.strName;
-	self.namelabel.frame = messageFrame.nameF;
+    self.namelabel.text = message.nickName;
+	self.namelabel.frame = messageFrame.nameFrame;
 	
     // 4、设置内容
-    [self.btnContent setTitle:@"" forState:UIControlStateNormal];
-    self.btnContent.voiceBackView.hidden = YES;
-    self.btnContent.backImageView.hidden = YES;
+	self.btnContent.messageFrame = messageFrame;
 	
-    self.btnContent.frame = messageFrame.contentF;
-    
-    if (message.from == UUMessageFromMe) {
-        self.btnContent.isMyMessage = YES;
-        [self.btnContent setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentSmaller, ChatContentTopBottom, ChatContentBiger);
-    } else {
-        self.btnContent.isMyMessage = NO;
-        [self.btnContent setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
-        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentBiger, ChatContentTopBottom, ChatContentSmaller);
-    }
-    
-    //背景气泡图
-    UIImage *normal;
-    if (message.from == UUMessageFromMe) {
-        normal = [UIImage uu_imageWithName:@"chatto_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
-    }
-    else{
-        normal = [UIImage uu_imageWithName:@"chatfrom_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
-    }
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
-	
-    switch (message.type) {
-        case UUMessageTypeText:
-            [self.btnContent setTitle:message.strContent forState:UIControlStateNormal];
-            break;
-        case UUMessageTypePicture:
-        {
-            self.btnContent.backImageView.hidden = NO;
-            self.btnContent.backImageView.image = message.picture;
-            self.btnContent.backImageView.frame = CGRectMake(0, 0, self.btnContent.frame.size.width, self.btnContent.frame.size.height);
-            [self makeMaskView:self.btnContent.backImageView withImage:normal];
-        }
-            break;
-        case UUMessageTypeVoice:
-        {
-            self.btnContent.voiceBackView.hidden = NO;
-            self.btnContent.second.text = [NSString stringWithFormat:@"%@'s Voice",message.strVoiceTime];
-            _songData = message.voice;
-//            _voiceURL = [NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strVoice];
-        }
-            break;
-            
-        default:
-            break;
-    }
-}
-
-- (void)makeMaskView:(UIView *)view withImage:(UIImage *)image
-{
-    UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
-    imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
-    view.layer.mask = imageViewMask.layer;
+	if (messageFrame.message.type == UUMessageTypeVoice) {
+		_songData = messageFrame.message.voiceData;
+	}
 }
 
 //处理监听触发事件

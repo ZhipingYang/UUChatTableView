@@ -7,19 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UUMessageFrame.h"
 
 @interface UUMessageContentButton : UIButton
 
 //bubble imgae
-@property (nonatomic, retain) UIImageView *backImageView;
+@property (nonatomic, strong) UIImageView *backImageView;
 
 //audio
-@property (nonatomic, retain) UIView *voiceBackView;
-@property (nonatomic, retain) UILabel *second;
-@property (nonatomic, retain) UIImageView *voice;
-@property (nonatomic, retain) UIActivityIndicatorView *indicator;
+@property (nonatomic, strong) UIView *voiceBackView;
+@property (nonatomic, strong) UILabel *second;
+@property (nonatomic, strong) UIImageView *voice;
+@property (nonatomic, strong) UIActivityIndicatorView *indicator;
 
-@property (nonatomic, assign) BOOL isMyMessage;
+@property (nonatomic, strong) UUMessageFrame *messageFrame;
 
 
 - (void)benginLoadVoice;

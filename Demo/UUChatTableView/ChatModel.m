@@ -7,8 +7,7 @@
 //
 
 #import "ChatModel.h"
-
-#import "UUMessage.h"
+#import "DemoMessage.h"
 #import "UUMessageFrame.h"
 
 @implementation ChatModel
@@ -36,7 +35,7 @@
 - (void)addSpecifiedItem:(NSDictionary *)dic
 {
     UUMessageFrame *messageFrame = [[UUMessageFrame alloc]init];
-    UUMessage *message = [[UUMessage alloc] init];
+    DemoMessage *message = [[DemoMessage alloc] init];
     NSMutableDictionary *dataDic = [NSMutableDictionary dictionaryWithDictionary:dic];
     
     NSString *URLStr = @"http://img0.bdstatic.com/img/image/shouye/xinshouye/mingxing16.jpg";
@@ -44,13 +43,12 @@
     [dataDic setObject:[[NSDate date] description] forKey:@"strTime"];
 	[dataDic setObject:@"Hi:sister" forKey:@"strName"];
     [dataDic setObject:URLStr forKey:@"strIcon"];
-    
-    [message setWithDict:dataDic];
+	
+	message.dict = dataDic;
     [message minuteOffSetStart:previousTime end:dataDic[@"strTime"]];
-    messageFrame.showTime = message.showDateLabel;
-    [messageFrame setMessage:message];
-    
-    if (message.showDateLabel) {
+	messageFrame.message = message;
+	
+    if (message.date) {
         previousTime = dataDic[@"strTime"];
     }
     [self.dataSource addObject:messageFrame];
@@ -66,13 +64,12 @@ static NSString *previousTime = nil;
         
         NSDictionary *dataDic = [self getDic];
         UUMessageFrame *messageFrame = [[UUMessageFrame alloc]init];
-        UUMessage *message = [[UUMessage alloc] init];
-        [message setWithDict:dataDic];
+        DemoMessage *message = [[DemoMessage alloc] init];
+		message.dict = dataDic;
         [message minuteOffSetStart:previousTime end:dataDic[@"strTime"]];
-        messageFrame.showTime = message.showDateLabel;
         [messageFrame setMessage:message];
         
-        if (message.showDateLabel) {
+        if (message.date) {
             previousTime = dataDic[@"strTime"];
         }
         [result addObject:messageFrame];

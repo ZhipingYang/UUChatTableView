@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65A78CEB20064FD2001F24DF /* DemoMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 65A78CEA20064FD2001F24DF /* DemoMessage.m */; };
 		65BDA9271FFD02E400C0848A /* UUAVAudioPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9171FFD02E400C0848A /* UUAVAudioPlayer.m */; };
 		65BDA9281FFD02E400C0848A /* UUInputFunctionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9181FFD02E400C0848A /* UUInputFunctionView.m */; };
 		65BDA9291FFD02E400C0848A /* UUMessageContentButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA91A1FFD02E400C0848A /* UUMessageContentButton.m */; };
 		65BDA92A1FFD02E400C0848A /* UUMessageFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA91F1FFD02E400C0848A /* UUMessageFrame.m */; };
 		65BDA92B1FFD02E400C0848A /* UUMessageCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9231FFD02E400C0848A /* UUMessageCell.m */; };
 		65BDA92C1FFD02E400C0848A /* UUProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9241FFD02E400C0848A /* UUProgressHUD.m */; };
-		65BDA92D1FFD02E400C0848A /* UUMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9251FFD02E400C0848A /* UUMessage.m */; };
 		65BDA92E1FFD02E400C0848A /* UUImageAvatarBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDA9261FFD02E400C0848A /* UUImageAvatarBrowser.m */; };
 		65BDA9301FFD032C00C0848A /* UUChatTableView.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 65BDA92F1FFD032C00C0848A /* UUChatTableView.bundle */; };
 		65BDAAF71FFE66DD00C0848A /* UUChatCategory.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BDAAF61FFE66DD00C0848A /* UUChatCategory.m */; };
@@ -45,6 +45,8 @@
 		0C1DFEA83C0F1A67F297FE52 /* Pods-UUChatTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UUChatTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-UUChatTableView/Pods-UUChatTableView.release.xcconfig"; sourceTree = "<group>"; };
 		0D9A386DD91B302B830B13BB /* Pods-UUChatTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UUChatTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-UUChatTableView/Pods-UUChatTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		3E171B44BD2925E1410C2AA8 /* Pods_UUChatTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_UUChatTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		65A78CE920064FD2001F24DF /* DemoMessage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DemoMessage.h; sourceTree = "<group>"; };
+		65A78CEA20064FD2001F24DF /* DemoMessage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoMessage.m; sourceTree = "<group>"; };
 		65BDA9171FFD02E400C0848A /* UUAVAudioPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUAVAudioPlayer.m; sourceTree = "<group>"; };
 		65BDA9181FFD02E400C0848A /* UUInputFunctionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUInputFunctionView.m; sourceTree = "<group>"; };
 		65BDA9191FFD02E400C0848A /* UUMessageFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUMessageFrame.h; sourceTree = "<group>"; };
@@ -59,7 +61,6 @@
 		65BDA9221FFD02E400C0848A /* UUMessageContentButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUMessageContentButton.h; sourceTree = "<group>"; };
 		65BDA9231FFD02E400C0848A /* UUMessageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUMessageCell.m; sourceTree = "<group>"; };
 		65BDA9241FFD02E400C0848A /* UUProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUProgressHUD.m; sourceTree = "<group>"; };
-		65BDA9251FFD02E400C0848A /* UUMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUMessage.m; sourceTree = "<group>"; };
 		65BDA9261FFD02E400C0848A /* UUImageAvatarBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UUImageAvatarBrowser.m; sourceTree = "<group>"; };
 		65BDA92F1FFD032C00C0848A /* UUChatTableView.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = UUChatTableView.bundle; sourceTree = "<group>"; };
 		65BDAAF51FFE66DD00C0848A /* UUChatCategory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UUChatCategory.h; sourceTree = "<group>"; };
@@ -132,7 +133,6 @@
 				65BDA9201FFD02E400C0848A /* UUInputFunctionView.h */,
 				65BDA9181FFD02E400C0848A /* UUInputFunctionView.m */,
 				65BDA91E1FFD02E400C0848A /* UUMessage.h */,
-				65BDA9251FFD02E400C0848A /* UUMessage.m */,
 				65BDA91C1FFD02E400C0848A /* UUMessageCell.h */,
 				65BDA9231FFD02E400C0848A /* UUMessageCell.m */,
 				65BDA9221FFD02E400C0848A /* UUMessageContentButton.h */,
@@ -175,6 +175,8 @@
 			children = (
 				B7B905201A5B770200A46EFD /* AppDelegate.h */,
 				B7B905211A5B770200A46EFD /* AppDelegate.m */,
+				65A78CE920064FD2001F24DF /* DemoMessage.h */,
+				65A78CEA20064FD2001F24DF /* DemoMessage.m */,
 				B7B905421A5B772900A46EFD /* RootViewController.h */,
 				B7B905431A5B772900A46EFD /* RootViewController.m */,
 				B7B905ED1A5BD04700A46EFD /* ChatModel.h */,
@@ -399,13 +401,13 @@
 				65BDA92C1FFD02E400C0848A /* UUProgressHUD.m in Sources */,
 				B7B905221A5B770200A46EFD /* AppDelegate.m in Sources */,
 				B7B905451A5B772900A46EFD /* RootViewController.m in Sources */,
+				65A78CEB20064FD2001F24DF /* DemoMessage.m in Sources */,
 				65BDA9281FFD02E400C0848A /* UUInputFunctionView.m in Sources */,
 				B7B9051F1A5B770200A46EFD /* main.m in Sources */,
 				65BDA92A1FFD02E400C0848A /* UUMessageFrame.m in Sources */,
 				65BDA9291FFD02E400C0848A /* UUMessageContentButton.m in Sources */,
 				65BDA9271FFD02E400C0848A /* UUAVAudioPlayer.m in Sources */,
 				B7B905C01A5B7FCB00A46EFD /* NSDate+Utils.m in Sources */,
-				65BDA92D1FFD02E400C0848A /* UUMessage.m in Sources */,
 				65BDAAF71FFE66DD00C0848A /* UUChatCategory.m in Sources */,
 				65BDA92B1FFD02E400C0848A /* UUMessageCell.m in Sources */,
 				B7B905EF1A5BD04700A46EFD /* ChatModel.m in Sources */,
@@ -561,7 +563,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.uyiuyao.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "chelun any app";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -587,7 +589,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.uyiuyao.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "chelun any app";
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

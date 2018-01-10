@@ -147,8 +147,7 @@
 	[_recorder prepareToRecord];
 	_recorder.meteringEnabled = YES;
 	
-	if (!audioSession.inputIsAvailable) {
-		
+	if (!audioSession.inputAvailable) {
 		return;
 	}
 	

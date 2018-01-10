@@ -18,20 +18,17 @@
 #define ChatTimeFont [UIFont systemFontOfSize:11]    //时间字体
 #define ChatContentFont [UIFont systemFontOfSize:14] //内容字体
 
-#import <UIKit/UIKit.h>
-
-@class UUMessage;
+#import "UUMessage.h"
 
 @interface UUMessageFrame : NSObject
 
-@property (nonatomic, assign, readonly) CGRect timeF;
-@property (nonatomic, assign, readonly) CGRect iconF;
-@property (nonatomic, assign, readonly) CGRect nameF;
-@property (nonatomic, assign, readonly) CGRect contentF;
+@property (nonatomic, readonly) CGRect timeFrame;
+@property (nonatomic, readonly) CGRect iconFrame;
+@property (nonatomic, readonly) CGRect nameFrame;
+@property (nonatomic, readonly) CGRect contentFrame;
 
-@property (nonatomic, assign, readonly) CGFloat cellHeight;
-@property (nonatomic, strong) UUMessage *message;
+@property (nonatomic, readonly) CGFloat cellHeight;
 
-@property (nonatomic, assign) BOOL showTime;
+@property (nonatomic, strong) id<UUMessage> message;
 
 @end

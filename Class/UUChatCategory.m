@@ -7,7 +7,7 @@
 //
 
 #import "UUChatCategory.h"
-#import "UUMessage.h"
+#import "UUMessageCell.h"
 
 @implementation UIView(UUChatCategory)
 
@@ -181,7 +181,7 @@
 
 + (nullable instancetype)uu_photoViewerResourceBundle
 {
-	NSString *resourceBundlePath = [[NSBundle bundleForClass:[UUMessage class]] pathForResource:@"UUChatTableView" ofType:@"bundle"];
+	NSString *resourceBundlePath = [[NSBundle bundleForClass:[UUMessageCell class]] pathForResource:@"UUChatTableView" ofType:@"bundle"];
 	return [self bundleWithPath:resourceBundlePath];
 }
 

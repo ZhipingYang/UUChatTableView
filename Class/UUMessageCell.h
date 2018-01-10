@@ -6,14 +6,23 @@
 //  Copyright (c) 2014年 uyiuyao. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
-#import "UUMessageContentButton.h"
+#import "UUMessage.h"
 
+NS_ASSUME_NONNULL_BEGIN
 @class UUMessageFrame;
 @class UUMessageCell;
+
 @protocol UUMessageCellDelegate <NSObject>
 @optional
-- (void)chatCell:(UUMessageCell *)cell headImageDidClick:(NSString *)userId;
+
+/**
+ cell的头像点击
+
+ @param cell 当前头像的cell
+ @param message cell的承载信息 model
+ */
+- (void)chatCell:(UUMessageCell *)cell headImageDidClick:(id<UUMessage>)message;
+
 @end
 
 
@@ -25,3 +34,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END
