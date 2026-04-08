@@ -58,12 +58,12 @@
             [UUDemoParticipant participantWithIdentifier:@"noa" displayName:@"Noa" avatarSeed:3]
         ];
         _sampleTexts = @[
-            @"这个 Demo 现在只保留核心聊天能力，界面也该像个成品。",
-            @"纯代码生成工程以后，仓库会轻很多，验证链路也更干净。",
-            @"We only keep text, picture and voice so the core behavior stays readable.",
-            @"下拉会继续补历史消息，用来验证时间标签和排版节奏。",
-            @"The podspec stays wired in, so local demo and release validation still share one path.",
-            @"基础设施稳定之后，再开始重构优化，节奏会舒服很多。"
+            @"The clean path ships faster than the clever path. 🚀",
+            @"One repo, one demo, one validation loop. 🧩",
+            @"Text, photo, and voice are enough to prove the chat core. 🎯",
+            @"Pull to load more history and check the spacing rhythm. ⏳",
+            @"The podspec and demo still share the same release path. 📦",
+            @"Once the foundation feels calm, polishing gets fun again. ✨"
         ];
         [self reloadConversationWithGroupMode:NO];
     }

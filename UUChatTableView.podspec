@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'UUChatTableView'
-  spec.version      = '1.1.0'
+  spec.version      = '2.0.0'
   spec.summary      = 'Lightweight UIKit chat bubbles with text, image, and voice support.'
   spec.description  = <<-DESC
     UUChatTableView provides a small Objective-C chat UI focused on the core message

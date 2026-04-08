@@ -4,6 +4,7 @@
 #import <UUChatTableView/UUMessage.h>
 #import <UUChatTableView/UUMessageCell.h>
 #import <UUChatTableView/UUMessageFrame.h>
+#import <UUChatTableView/UUVoiceRecordingHUDView.h>
 
 @interface UUDemoChatViewController () <UUInputFunctionViewDelegate, UUMessageCellDelegate, UITableViewDataSource, UITableViewDelegate>
 
@@ -22,6 +23,8 @@
 @property (nonatomic, strong) CAGradientLayer *backgroundGradientLayer;
 @property (nonatomic, assign) CGFloat lastKnownLayoutWidth;
 @property (nonatomic, assign) BOOL didExportDebugSnapshot;
+@property (nonatomic, assign) BOOL didPrepareSnapshotVariant;
+@property (nonatomic, strong) UUVoiceRecordingHUDView *documentationRecordingHUDView;
 
 @end
 
@@ -93,6 +96,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [self prepareSnapshotVariantIfNeeded];
     [self exportDebugSnapshotIfNeeded];
 }
 
@@ -306,10 +310,11 @@
             return;
         }
 
-        NSString *filePath = [snapshotDirectory stringByAppendingPathComponent:@"uuchat-demo-debug.png"];
+        NSString *filePath = [snapshotDirectory stringByAppendingPathComponent:[self snapshotFileNameForCurrentVariant]];
         [imageData writeToFile:filePath atomically:YES];
 
-        NSString *metadata = [NSString stringWithFormat:@"window=%@\nscreen=%@\nrows=%ld\ncontentSize=%@\ncontentOffset=%@\nvisibleCells=%lu\nidiom=%ld\n",
+        NSString *metadata = [NSString stringWithFormat:@"variant=%@\nwindow=%@\nscreen=%@\nrows=%ld\ncontentSize=%@\ncontentOffset=%@\nvisibleCells=%lu\nidiom=%ld\n",
+                              [self snapshotVariant],
                               NSStringFromCGRect(window.bounds),
                               NSStringFromCGRect(UIScreen.mainScreen.bounds),
                               (long)self.chatDataSource.dataSource.count,
@@ -320,6 +325,201 @@
         NSString *metadataPath = [snapshotDirectory stringByAppendingPathComponent:@"uuchat-demo-debug.txt"];
         [metadata writeToFile:metadataPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
     });
+}
+
+- (NSString *)snapshotVariant
+{
+    NSString *variant = NSProcessInfo.processInfo.environment[@"UUCHAT_EXPORT_VARIANT"];
+    if (variant.length == 0) {
+        return @"copy-menu";
+    }
+    if ([variant isEqualToString:@"private"]) {
+        return @"copy-menu";
+    }
+    if ([variant isEqualToString:@"group"]) {
+        return @"media-actions";
+    }
+    return variant;
+}
+
+- (NSString *)snapshotFileNameForCurrentVariant
+{
+    NSString *variant = [self snapshotVariant];
+    if ([variant isEqualToString:@"media-actions"]) {
+        return @"media-actions.png";
+    }
+    if ([variant isEqualToString:@"recording-hud"]) {
+        return @"recording-hud.png";
+    }
+    if ([variant isEqualToString:@"recording-hud-cancel"]) {
+        return @"recording-hud-cancel.png";
+    }
+    return @"copy-menu.png";
+}
+
+- (void)prepareSnapshotVariantIfNeeded
+{
+    if (self.didPrepareSnapshotVariant) {
+        return;
+    }
+
+    NSString *snapshotDirectory = NSProcessInfo.processInfo.environment[@"UUCHAT_EXPORT_SNAPSHOT_DIR"];
+    if (snapshotDirectory.length == 0) {
+        return;
+    }
+
+    self.didPrepareSnapshotVariant = YES;
+
+    NSString *variant = [self snapshotVariant];
+    BOOL groupMode = [variant isEqualToString:@"media-actions"];
+    self.modeSegmentControl.selectedSegmentIndex = groupMode ? 1 : 0;
+    [self.chatDataSource reloadConversationWithGroupMode:groupMode];
+    [self refreshHeaderCopy];
+    [self.chatTableView reloadData];
+    [self scrollToBottomAnimated:NO];
+
+    if ([variant isEqualToString:@"recording-hud"] || [variant isEqualToString:@"recording-hud-cancel"]) {
+        [self configureInputViewForRecordingSnapshot];
+        [self showDocumentationRecordingHUDCancelling:[variant isEqualToString:@"recording-hud-cancel"]];
+        return;
+    }
+
+    if ([variant isEqualToString:@"media-actions"]) {
+        [self configureMediaActionsSnapshot];
+        return;
+    }
+
+    [self configureCopyMenuSnapshot];
+}
+
+- (void)configureInputViewForRecordingSnapshot
+{
+    [self.inputFuncView clearTextInput];
+    [self.inputFuncView setValue:@YES forKey:@"voiceModeEnabled"];
+    [self.inputFuncView.btnVoiceRecord setTitle:@"Recording..." forState:UIControlStateNormal];
+    [self.inputFuncView.btnVoiceRecord setTitle:@"Release to Send" forState:UIControlStateHighlighted];
+    self.inputFuncView.btnVoiceRecord.highlighted = NO;
+    [self.inputFuncView setNeedsLayout];
+    [self.inputFuncView layoutIfNeeded];
+}
+
+- (void)configureCopyMenuSnapshot
+{
+    [self.inputFuncView clearTextInput];
+    [self.view endEditing:YES];
+    [self.view layoutIfNeeded];
+    [self.chatTableView layoutIfNeeded];
+    [self scrollToBottomAnimated:NO];
+
+    NSIndexPath *indexPath = [self snapshotIndexPathForLastTextMessage];
+    if (!indexPath) {
+        return;
+    }
+
+    UUMessageCell *cell = [self.chatTableView cellForRowAtIndexPath:indexPath];
+    if (!cell) {
+        [self.chatTableView scrollToRowAtIndexPath:indexPath
+                                  atScrollPosition:UITableViewScrollPositionBottom
+                                          animated:NO];
+        [self.chatTableView layoutIfNeeded];
+        cell = [self.chatTableView cellForRowAtIndexPath:indexPath];
+    }
+
+    if (!cell) {
+        return;
+    }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    SEL selector = NSSelectorFromString(@"showCopyMenu");
+    if ([cell respondsToSelector:selector]) {
+        [cell performSelector:selector];
+    }
+#pragma clang diagnostic pop
+}
+
+- (void)configureMediaActionsSnapshot
+{
+    [self.inputFuncView clearTextInput];
+    [self.view endEditing:YES];
+    [self.chatDataSource appendPictureMessage:[self documentationSnapshotImage]];
+    [self.chatTableView reloadData];
+    [self.chatTableView layoutIfNeeded];
+    [self scrollToBottomAnimated:NO];
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+    SEL selector = NSSelectorFromString(@"handlePrimaryActionTap:");
+    if ([self.inputFuncView respondsToSelector:selector]) {
+        [self.inputFuncView performSelector:selector withObject:self.inputFuncView.btnSendMessage];
+    }
+#pragma clang diagnostic pop
+}
+
+- (NSIndexPath *)snapshotIndexPathForLastTextMessage
+{
+    NSArray<UUMessageFrame *> *frames = self.chatDataSource.dataSource;
+    for (NSInteger index = (NSInteger)frames.count - 1; index >= 0; index--) {
+        UUMessageFrame *frame = frames[(NSUInteger)index];
+        if (frame.message.contentType == UUMessageTypeText) {
+            return [NSIndexPath indexPathForRow:index inSection:0];
+        }
+    }
+
+    return nil;
+}
+
+- (UIImage *)documentationSnapshotImage
+{
+    CGSize canvasSize = CGSizeMake(240.0, 160.0);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:canvasSize];
+    return [renderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
+        CGContextRef context = rendererContext.CGContext;
+        UIColor *startColor = [UIColor colorWithRed:0.91 green:0.58 blue:0.38 alpha:1.0];
+        UIColor *endColor = [UIColor colorWithRed:0.53 green:0.80 blue:0.93 alpha:1.0];
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        NSArray *colors = @[(__bridge id)startColor.CGColor, (__bridge id)endColor.CGColor];
+        CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)colors, NULL);
+        CGContextDrawLinearGradient(context, gradient, CGPointZero, CGPointMake(canvasSize.width, canvasSize.height), 0);
+        CGGradientRelease(gradient);
+        CGColorSpaceRelease(colorSpace);
+
+        CGRect cardRect = CGRectInset((CGRect){CGPointZero, canvasSize}, 18.0, 18.0);
+        [[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.18] setFill];
+        [[UIBezierPath bezierPathWithRoundedRect:cardRect cornerRadius:30.0] fill];
+
+        [[UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.22] setFill];
+        [[UIBezierPath bezierPathWithOvalInRect:CGRectMake(CGRectGetMinX(cardRect) + 20.0,
+                                                           CGRectGetMinY(cardRect) + 20.0,
+                                                           52.0,
+                                                           52.0)] fill];
+
+        NSDictionary<NSAttributedStringKey, id> *titleAttributes = @{
+            NSFontAttributeName : [UIFont systemFontOfSize:24.0 weight:UIFontWeightHeavy],
+            NSForegroundColorAttributeName : UIColor.whiteColor
+        };
+        [@"Photo + Actions" drawAtPoint:CGPointMake(CGRectGetMinX(cardRect) + 20.0,
+                                                    CGRectGetMidY(cardRect) - 4.0)
+                         withAttributes:titleAttributes];
+
+        NSDictionary<NSAttributedStringKey, id> *eyebrowAttributes = @{
+            NSFontAttributeName : [UIFont monospacedSystemFontOfSize:11.0 weight:UIFontWeightSemibold],
+            NSForegroundColorAttributeName : [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.80]
+        };
+        [@"README SNAPSHOT" drawAtPoint:CGPointMake(CGRectGetMinX(cardRect) + 20.0,
+                                                    CGRectGetMinY(cardRect) + 80.0)
+                         withAttributes:eyebrowAttributes];
+    }];
+}
+
+- (void)showDocumentationRecordingHUDCancelling:(BOOL)cancelling
+{
+    [self.documentationRecordingHUDView dismissAnimated:NO];
+
+    self.documentationRecordingHUDView = [[UUVoiceRecordingHUDView alloc] initWithFrame:CGRectZero];
+    [self.documentationRecordingHUDView presentInView:self.view];
+    [self.documentationRecordingHUDView updateWithDuration:18 level:0.72];
+    [self.documentationRecordingHUDView setCancelling:cancelling];
 }
 
 - (void)segmentChanged:(UISegmentedControl *)segmentControl
