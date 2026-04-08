@@ -1,0 +1,27 @@
+name: UUChatTableViewDemo
+
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "13.0"
+
+targets:
+  UUChatTableViewDemo:
+    type: application
+    platform: iOS
+    deploymentTarget: "13.0"
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.zhipingyang.UUChatTableViewDemo
+        GENERATE_INFOPLIST_FILE: YES
+        IPHONEOS_DEPLOYMENT_TARGET: 13.0
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
+        INFOPLIST_KEY_NSCameraUsageDescription: Take photos to send in the chat demo.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: Record voice messages in the chat demo.
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Choose photos to send in the chat demo.
+        TARGETED_DEVICE_FAMILY: "1,2"

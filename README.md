@@ -1,70 +1,61 @@
-UUChatTableView
-===============
+# UUChatTableView
 
-Cocoa UI component for chat bubbles with text, images and audio support
+一个轻量的 Objective-C 聊天气泡组件，保留了最核心的消息模型、布局计算、Cell 渲染和输入栏逻辑，并提供了一个纯代码 Demo。
 
-## GIF 动画演示
-<p align="center"><img width="250" src ="https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests/ChatTableView.gif"/></p>
+## 当前结构
 
-## 截图 - ScreenShot
+- `Class/`
+  组件源码，包含消息模型、布局、Cell、输入栏、语音播放和图片预览。
+- `Demo/`
+  纯代码 Demo，工程由 `project.yml` 生成，再通过 CocoaPods 接入当前仓库的 `podspec`。
+- `UUChatTableView.podspec`
+  发布配置，可直接用于 `pod lib lint` / 发布流程。
 
-<p align="center">
-<img width=33% alt="wx20170601-170002 2x" src="https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-5.jpg"> <img width=33% alt="wx20170601-170002 2x" src="https://github.com/ZhipingYang/UUChatTableView/raw/master/Demo/UUChatTableViewTests//ScreenShot/QQ20150113-4.jpg"> <img width=33% alt="wx20170601-170002 2x" src="https://github.com/ZhipingYang/DataResource/raw/master/UUChat/IMG_0054.jpg">
-</p>
+## Demo 运行方式
 
-### 群聊（GroupChat）效果图（新添UI细节）
-
-## 使用类介绍 - Introduce
-
-[类名](https://github.com/ZhipingYang/UUChatTableView/tree/master/UUChat) | 作用及用法
------ | -----
-[UUMessage](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUMessage.h) | 内容数据Model，储存文字、语音、头像、图片、时间等等
-[UUMessageFrame](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUMessageFrame.h) | cell的model，设置气泡聊天的布局
-[UUMessageCell](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUMessageContentButton.h) | 呈现UI，并做cell的事件处理（语音、图片、头像点击）
-[UUMessageContentButton](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/) | 气泡内容的封装及copy功能
-[UUInputFunctionView](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUInputFunctionView.h) | tableView底部的视图，相当于ToolBar
-[UUImageAvatarBrowser](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUImageAvatarBrowser.h) | 放大图片功能，其实这是障眼法[详细查看](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUImageAvatarBrowser.m)
-[UUAVAudioPlayer](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUAVAudioPlayer.h) | 语音功能封装，实现本地和线上URL播放，缺点是还没有做像[SDWebImage](https://github.com/rs/SDWebImage)那样的本地缓存
-[UUProgressHUD](https://github.com/ZhipingYang/UUChatTableView/blob/master/UUChat/UUProgressHUD.h) | Window层上得HUD，功能简易
-
-第三方库 | 说明
------ | -----
-[MJRefresh](https://github.com/CoderMJLee/MJRefresh) | 下拉加载更多聊天记录
-[AFNetworking](https://github.com/AFNetworking/AFNetworking) | 仅使用UIKit+AFNetworking，类似 [SDWebImage](https://github.com/rs/SDWebImage)
-VoiceLib | 忘记了来自哪里的，找半天没有找到。语音录入及格式转化成MP3
-
-## 使用方法 - Usage
-
-声明一下| 
------ | -----
-当前的数据是在固定模式下随机模拟的，不包含用户输入的所有可能性|
-有不习惯`Xib编程`的有问题可以[问我](https://github.com/ZhipingYang/UUChatTableView/issues/new),以前我因为不会而不想去改变 | 
-我还没有去试iOS6下得适配，要是你测试过油问题可以修改提交或者[告诉我](https://github.com/ZhipingYang/UUChatTableView/issues/new) | 
-有人提到群聊功能，只需要在getDic方法添加其他人信息即可[点击查看](https://github.com/ZhipingYang/UUChatTableView/blob/master/Demo/UUChatTableView/ChatModel.m#L78)|
-感谢[丁南](https://github.com/ijinmao)修复语音播放及其他的一些bug|
-
-#### 添加代理
- 
-UUInputFunctionViewDelegate
-```objc
-// 返回文字内容
-- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendMessage:(NSString *)message;
-// 返回图片数据
-- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendPicture:(UIImage *)image;
-// 返回语音数据和录音时长
-- (void)UUInputFunctionView:(UUInputFunctionView *)funcView sendVoice:(NSData *)voice time:(NSInteger)second;
-```
-UUMessageCellDelegate
-```objc
-//cell的头像点击
-- (void)headImageDidClick:(UUMessageCell *)cell userId:(NSString *)userId;
-//图片点击可有可无
-- (void)cellContentDidClick:(UUMessageCell *)cell image:(UIImage *)contentImage;
+```bash
+cd Demo
+xcodegen generate
+pod install
+open UUChatTableViewDemo.xcworkspace
 ```
 
-#### Swift版
-[Code版](https://github.com/ZhipingYang/UUChatSwift)
+Demo 内置假数据，默认覆盖：
 
-[StoryBoard版](https://github.com/ZhipingYang/UUChatSwift/tree/storyBoard)
+- 文本消息
+- 图片消息
+- 语音消息
+- 私聊 / 群聊切换
+- 下拉加载历史消息
 
-Swift2.0版将完全使用autolayout（storyboard或code）。
+## Pod 集成
+
+```ruby
+pod 'UUChatTableView'
+```
+
+本地联调可以直接使用：
+
+```ruby
+pod 'UUChatTableView', :path => '..'
+```
+
+## 核心类
+
+- `UUMessage`
+  消息模型，统一文字、图片、语音和时间信息。
+- `UUMessageFrame`
+  负责消息布局计算和 Cell 高度。
+- `UUMessageCell`
+  负责聊天气泡渲染、头像点击、图片预览、语音播放。
+- `UUInputFunctionView`
+  纯代码输入栏，支持文本、图片和按住录音。
+
+## 验证
+
+当前仓库已经通过以下本地验证：
+
+- `xcodegen generate`
+- `pod install`
+- `xcodebuild -workspace Demo/UUChatTableViewDemo.xcworkspace -scheme UUChatTableViewDemo -sdk iphonesimulator -configuration Debug build CODE_SIGNING_ALLOWED=NO`
+- `pod lib lint UUChatTableView.podspec --allow-warnings --skip-tests`

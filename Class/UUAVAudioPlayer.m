@@ -1,22 +1,14 @@
-//
-//  UUAVAudioPlayer.m
-//  BloodSugarForDoc
-//
-//  Created by shake on 14-9-1.
-//  Copyright (c) 2014年 shake. All rights reserved.
-//
-
 #import "UUAVAudioPlayer.h"
-#import <AVFoundation/AVFoundation.h>
 
+@interface UUAVAudioPlayer () <AVAudioPlayerDelegate>
 
-@interface UUAVAudioPlayer ()<AVAudioPlayerDelegate>
+@property (nonatomic, strong) NSURLSessionDataTask *currentTask;
 
 @end
 
 @implementation UUAVAudioPlayer
 
-+ (UUAVAudioPlayer *)sharedInstance
++ (instancetype)sharedInstance
 {
     static UUAVAudioPlayer *sharedInstance = nil;
     static dispatch_once_t onceToken;
@@ -26,66 +18,151 @@
     return sharedInstance;
 }
 
+- (void)playAudioFromURLString:(NSString *)URLString
+{
+    NSURL *url = [NSURL URLWithString:URLString];
+    if (!url) {
+        return;
+    }
+
+    [self.currentTask cancel];
+    self.currentTask = nil;
+    [self notifyDelegateDidBeginLoading];
+
+    __weak typeof(self) weakSelf = self;
+    self.currentTask = [[NSURLSession sharedSession] dataTaskWithURL:url
+                                                   completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error || data.length == 0) {
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf playSoundWithData:data];
+        });
+    }];
+    [self.currentTask resume];
+}
+
 - (void)playSongWithUrl:(NSString *)songUrl
 {
-    dispatch_async(dispatch_queue_create("playSoundFromUrl", NULL), ^{
-        [self.delegate UUAVAudioPlayerBeiginLoadVoice];
-        NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:songUrl]];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self playSoundWithData:data];
-        });
-    });
+    [self playAudioFromURLString:songUrl];
+}
+
+- (void)playAudioData:(NSData *)audioData
+{
+    [self.currentTask cancel];
+    self.currentTask = nil;
+    [self setupPlaySound];
+    [self playSoundWithData:audioData];
 }
 
 - (void)playSongWithData:(NSData *)songData
 {
-    [self setupPlaySound];
-    [self playSoundWithData:songData];
+    [self playAudioData:songData];
 }
 
 - (void)playSoundWithData:(NSData *)soundData
 {
-    if (_player) {
-        [_player stop];
-        _player.delegate = nil;
-        _player = nil;
+    if (soundData.length == 0) {
+        return;
     }
-    NSError *playerError;
-    _player = [[AVAudioPlayer alloc]initWithData:soundData error:&playerError];
-    _player.volume = 1.0f;
-    if (_player == nil){
-        NSLog(@"ERror creating player: %@", [playerError description]);
+
+    if (self.player) {
+        [self.player stop];
+        self.player.delegate = nil;
+        self.player = nil;
     }
-    _player.delegate = self;
-    [_player play];
-    [self.delegate UUAVAudioPlayerBeiginPlay];
+
+    NSError *playerError = nil;
+    self.player = [[AVAudioPlayer alloc] initWithData:soundData error:&playerError];
+    if (!self.player || playerError) {
+        NSLog(@"Error creating player: %@", playerError.localizedDescription);
+        return;
+    }
+
+    self.player.volume = 1.0f;
+    self.player.delegate = self;
+    [self.player prepareToPlay];
+    [self.player play];
+    [self notifyDelegateDidBeginPlayback];
 }
 
--(void)setupPlaySound
+- (void)setupPlaySound
 {
-    UIApplication *app = [UIApplication sharedApplication];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:app];
-    [[AVAudioSession sharedInstance] setCategory: AVAudioSessionCategoryPlayback error: nil];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        UIApplication *application = UIApplication.sharedApplication;
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationWillResignActive:)
+                                                     name:UIApplicationWillResignActiveNotification
+                                                   object:application];
+    });
+
+    NSError *error = nil;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+    [[AVAudioSession sharedInstance] setActive:YES error:&error];
+}
+
+- (void)stopPlayback
+{
+    [self.currentTask cancel];
+    self.currentTask = nil;
+    if (self.player.isPlaying) {
+        [self.player stop];
+    }
 }
 
 - (void)stopSound
 {
-	if (_player.isPlaying) {
-		[_player stop];
-	}
+    [self stopPlayback];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-	[self.delegate UUAVAudioPlayerDidFinishPlay];
+    (void)application;
+    [self notifyDelegateDidFinishPlaybackSuccessfully:NO];
 }
-
-#pragma mark - AVAudioPlayerDelegate
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
-    [self.delegate UUAVAudioPlayerDidFinishPlay];
+    (void)player;
+    [self notifyDelegateDidFinishPlaybackSuccessfully:flag];
+}
+
+- (void)notifyDelegateDidBeginLoading
+{
+    if ([self.delegate respondsToSelector:@selector(audioPlayerDidBeginLoadingVoice:)]) {
+        [self.delegate audioPlayerDidBeginLoadingVoice:self];
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(UUAVAudioPlayerBeiginLoadVoice)]) {
+        [self.delegate UUAVAudioPlayerBeiginLoadVoice];
+    }
+}
+
+- (void)notifyDelegateDidBeginPlayback
+{
+    if ([self.delegate respondsToSelector:@selector(audioPlayerDidBeginPlayback:)]) {
+        [self.delegate audioPlayerDidBeginPlayback:self];
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(UUAVAudioPlayerBeiginPlay)]) {
+        [self.delegate UUAVAudioPlayerBeiginPlay];
+    }
+}
+
+- (void)notifyDelegateDidFinishPlaybackSuccessfully:(BOOL)success
+{
+    if ([self.delegate respondsToSelector:@selector(audioPlayerDidFinishPlayback:successfully:)]) {
+        [self.delegate audioPlayerDidFinishPlayback:self successfully:success];
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(UUAVAudioPlayerDidFinishPlay)]) {
+        [self.delegate UUAVAudioPlayerDidFinishPlay];
+    }
 }
 
 @end

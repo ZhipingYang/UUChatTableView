@@ -1,12 +1,16 @@
-# Uncomment the next line to define a global platform for your project
+source 'https://cdn.cocoapods.org/'
 
-platform :ios, '8.0'
+install! 'cocoapods',
+  :deterministic_uuids => false,
+  :generate_multiple_pod_projects => true,
+  :incremental_installation => true,
+  :disable_input_output_paths => true,
+  :warn_for_unused_master_specs_repo => false
 
-use_frameworks!
+platform :ios, '13.0'
 
-target 'UUChatTableView' do
+project 'UUChatTableViewDemo.xcodeproj'
 
-  pod 'AFNetworking'
-  pod 'MJRefresh'
-
+target 'UUChatTableViewDemo' do
+  pod 'UUChatTableView', :path => '..'
 end

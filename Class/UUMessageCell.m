@@ -1,263 +1,418 @@
-//
-//  UUMessageCell.m
-//  UUChatDemoForTextVoicePicture
-//
-//  Created by shake on 14-8-27.
-//  Copyright (c) 2014年 uyiuyao. All rights reserved.
-//
-
 #import "UUMessageCell.h"
 #import "UUMessage.h"
 #import "UUMessageFrame.h"
 #import "UUAVAudioPlayer.h"
-#import "UIImageView+AFNetworking.h"
-#import "UIButton+AFNetworking.h"
 #import "UUImageAvatarBrowser.h"
-#import "UUChatCategory.h"
 
-@interface UUMessageCell ()<UUAVAudioPlayerDelegate>
-{
-    NSString *_voiceURL;
-    NSData *_songData;
-    
-    UUAVAudioPlayer *_audio;
-    
-    UIView *_headImageBackView;
-    BOOL _contentVoiceIsPlaying;
-}
+static NSString * const UUVoicePlayHasInterruptNotification = @"UUVoicePlayHasInterruptNotification";
+
+@interface UUMessageCell () <UUAVAudioPlayerDelegate>
 
 @property (nonatomic, strong) UILabel *dateLabel;
-@property (nonatomic, strong) UILabel *namelabel;
+@property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UIButton *headImageButton;
-
 @property (nonatomic, strong) UUMessageContentButton *btnContent;
+@property (nonatomic, strong) NSURLSessionDataTask *avatarTask;
+@property (nonatomic, copy) NSString *representedAvatarIdentifier;
+@property (nonatomic, strong) NSData *voiceData;
+@property (nonatomic, strong) UUAVAudioPlayer *audioPlayer;
+@property (nonatomic, assign, getter=isContentVoicePlaying) BOOL contentVoicePlaying;
 
 @end
 
 @implementation UUMessageCell
 
-- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
++ (NSCache<NSString *, UIImage *> *)avatarImageCache
+{
+    static NSCache<NSString *, UIImage *> *avatarCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        avatarCache = [[NSCache alloc] init];
+    });
+    return avatarCache;
+}
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        
-        self.backgroundColor = [UIColor clearColor];
+        self.backgroundColor = UIColor.clearColor;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
-		
-        // 1、创建时间
+        self.contentView.backgroundColor = UIColor.clearColor;
+        self.audioPlayer = [UUAVAudioPlayer sharedInstance];
+
         self.dateLabel = [[UILabel alloc] init];
         self.dateLabel.textAlignment = NSTextAlignmentCenter;
-        self.dateLabel.textColor = [UIColor grayColor];
+        self.dateLabel.textColor = [UIColor colorWithRed:0.42 green:0.45 blue:0.51 alpha:1.0];
         self.dateLabel.font = ChatTimeFont;
+        self.dateLabel.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.62];
+        self.dateLabel.layer.masksToBounds = YES;
         [self.contentView addSubview:self.dateLabel];
-        
-        // 2、创建头像
-        _headImageBackView = [[UIView alloc]init];
-        _headImageBackView.layer.cornerRadius = 22;
-        _headImageBackView.layer.masksToBounds = YES;
-        _headImageBackView.backgroundColor = [[UIColor grayColor] colorWithAlphaComponent:0.4];
-        [self.contentView addSubview:_headImageBackView];
+
         self.headImageButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.headImageButton.layer.cornerRadius = 20;
+        self.headImageButton.layer.cornerRadius = ChatIconWH / 2.0;
         self.headImageButton.layer.masksToBounds = YES;
-        [self.headImageButton addTarget:self action:@selector(btnHeadImageClick:)  forControlEvents:UIControlEventTouchUpInside];
-        [_headImageBackView addSubview:self.headImageButton];
-        
-        // 3、创建头像下标
-        self.namelabel = [[UILabel alloc] init];
-        self.namelabel.textColor = [UIColor grayColor];
-        self.namelabel.textAlignment = NSTextAlignmentCenter;
-        self.namelabel.font = ChatTimeFont;
-		self.namelabel.numberOfLines = 0;
-        [self.contentView addSubview:self.namelabel];
-        
-        // 4、创建内容
+        self.headImageButton.layer.borderWidth = 2.0;
+        self.headImageButton.layer.borderColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.72].CGColor;
+        self.headImageButton.titleLabel.font = [UIFont systemFontOfSize:16 weight:UIFontWeightSemibold];
+        [self.headImageButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+        [self.headImageButton addTarget:self action:@selector(handleAvatarButtonTap:) forControlEvents:UIControlEventTouchUpInside];
+        [self.contentView addSubview:self.headImageButton];
+
+        self.nameLabel = [[UILabel alloc] init];
+        self.nameLabel.textColor = [UIColor colorWithRed:0.39 green:0.43 blue:0.50 alpha:0.92];
+        self.nameLabel.font = [UIFont monospacedSystemFontOfSize:11 weight:UIFontWeightSemibold];
+        self.nameLabel.numberOfLines = 1;
+        [self.contentView addSubview:self.nameLabel];
+
         self.btnContent = [UUMessageContentButton buttonWithType:UIButtonTypeCustom];
-        [self.btnContent setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         self.btnContent.titleLabel.font = ChatContentFont;
         self.btnContent.titleLabel.numberOfLines = 0;
-        [self.btnContent addTarget:self action:@selector(btnContentClick)  forControlEvents:UIControlEventTouchUpInside];
+        [self.btnContent addTarget:self action:@selector(handleContentButtonTap) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:self.btnContent];
-        
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(UUAVAudioPlayerDidFinishPlay) name:@"VoicePlayHasInterrupt" object:nil];
-        
-        //红外线感应监听
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(handleVoicePlaybackInterrupted:)
+                                                     name:UUVoicePlayHasInterruptNotification
+                                                   object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(sensorStateChange:)
                                                      name:UIDeviceProximityStateDidChangeNotification
                                                    object:nil];
-        _contentVoiceIsPlaying = NO;
-		
     }
     return self;
 }
 
 - (void)prepareForReuse
 {
-	[super prepareForReuse];
-	
+    [super prepareForReuse];
+
+    [self cancelAvatarLoading];
+    [self stopVoicePlaybackIfNeeded];
+    [self resetAvatarView];
+    [self resetContentState];
+
+    self.dateLabel.text = nil;
+    self.dateLabel.frame = CGRectZero;
+    self.dateLabel.hidden = YES;
+
+    self.nameLabel.text = nil;
+    self.nameLabel.frame = CGRectZero;
+    self.nameLabel.hidden = YES;
 }
 
-//头像点击
-- (void)btnHeadImageClick:(UIButton *)button{
-    if ([self.delegate respondsToSelector:@selector(chatCell:headImageDidClick:)])  {
-        [self.delegate chatCell:self headImageDidClick:self.messageFrame.message.strId];
-    }
-}
-
-- (void)btnContentClick{
-    //play audio
-    if (self.messageFrame.message.type == UUMessageTypeVoice) {
-        if(!_contentVoiceIsPlaying){
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"VoicePlayHasInterrupt" object:nil];
-            _contentVoiceIsPlaying = YES;
-            _audio = [UUAVAudioPlayer sharedInstance];
-            _audio.delegate = self;
-            //        [_audio playSongWithUrl:_voiceURL];
-            [_audio playSongWithData:_songData];
-        }else{
-            [self UUAVAudioPlayerDidFinishPlay];
-        }
-    }
-    //show the picture
-    else if (self.messageFrame.message.type == UUMessageTypePicture)
-    {
-        if (self.btnContent.backImageView) {
-            [UUImageAvatarBrowser showImage:self.btnContent.backImageView];
-        }
-        if ([self.delegate isKindOfClass:[UIViewController class]]) {
-            [[(UIViewController *)self.delegate view] endEditing:YES];
-        }
-    }
-    // show text and gonna copy that
-    else if (self.messageFrame.message.type == UUMessageTypeText)
-    {
-        [self.btnContent becomeFirstResponder];
-        UIMenuController *menu = [UIMenuController sharedMenuController];
-        [menu setTargetRect:self.btnContent.frame inView:self.btnContent.superview];
-        [menu setMenuVisible:YES animated:YES];
-    }
-}
-
-- (void)UUAVAudioPlayerBeiginLoadVoice
+- (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleAvatarButtonTap:(UIButton *)button
+{
+    (void)button;
+    NSString *userIdentifier = self.messageFrame.message.senderIdentifier ?: @"";
+    if ([self.delegate respondsToSelector:@selector(messageCell:didTapAvatarForUserIdentifier:)]) {
+        [self.delegate messageCell:self didTapAvatarForUserIdentifier:userIdentifier];
+        return;
+    }
+
+    if ([self.delegate respondsToSelector:@selector(chatCell:headImageDidClick:)]) {
+        [self.delegate chatCell:self headImageDidClick:userIdentifier];
+    }
+}
+
+- (void)handleContentButtonTap
+{
+    switch (self.messageFrame.message.contentType) {
+        case UUMessageTypeVoice:
+            [self toggleVoicePlayback];
+            return;
+        case UUMessageTypePicture:
+            [self showPicturePreview];
+            return;
+        case UUMessageTypeText:
+        default:
+            [self showCopyMenu];
+            return;
+    }
+}
+
+- (void)audioPlayerDidBeginLoadingVoice:(UUAVAudioPlayer *)audioPlayer
+{
+    (void)audioPlayer;
     [self.btnContent benginLoadVoice];
 }
 
-- (void)UUAVAudioPlayerBeiginPlay
+- (void)audioPlayerDidBeginPlayback:(UUAVAudioPlayer *)audioPlayer
 {
-    //开启红外线感应
+    (void)audioPlayer;
     [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
     [self.btnContent didLoadVoice];
 }
 
-- (void)UUAVAudioPlayerDidFinishPlay
+- (void)audioPlayerDidFinishPlayback:(UUAVAudioPlayer *)audioPlayer successfully:(BOOL)success
 {
-    //关闭红外线感应
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
-    _contentVoiceIsPlaying = NO;
-    [self.btnContent stopPlay];
-    [[UUAVAudioPlayer sharedInstance]stopSound];
+    (void)audioPlayer;
+    (void)success;
+    [self stopVoicePlaybackIfNeeded];
 }
 
-//内容及Frame设置
+- (void)handleVoicePlaybackInterrupted:(NSNotification *)notification
+{
+    (void)notification;
+    [self stopVoicePlaybackIfNeeded];
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    self.dateLabel.layer.cornerRadius = CGRectGetHeight(self.dateLabel.bounds) / 2.0;
+}
+
 - (void)setMessageFrame:(UUMessageFrame *)messageFrame
 {
     _messageFrame = messageFrame;
     UUMessage *message = messageFrame.message;
-    
-    // 1、设置时间
-    self.dateLabel.text = message.strTime;
-    self.dateLabel.frame = messageFrame.timeF;
-    
-    // 2、设置头像
-    _headImageBackView.frame = messageFrame.iconF;
-    self.headImageButton.frame = CGRectMake(2, 2, ChatIconWH-4, ChatIconWH-4);
-    [self.headImageButton setBackgroundImageForState:UIControlStateNormal
-                                          withURL:[NSURL URLWithString:message.strIcon]
-                                 placeholderImage:[UIImage uu_imageWithName:@"headImage.jpeg"]];
-    
-    // 3、设置下标
-    self.namelabel.text = message.strName;
-	self.namelabel.frame = messageFrame.nameF;
-	
-    // 4、设置内容
-    [self.btnContent setTitle:@"" forState:UIControlStateNormal];
-    self.btnContent.voiceBackView.hidden = YES;
-    self.btnContent.backImageView.hidden = YES;
-	
-    self.btnContent.frame = messageFrame.contentF;
-    
-    if (message.from == UUMessageFromMe) {
-        self.btnContent.isMyMessage = YES;
-        [self.btnContent setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentSmaller, ChatContentTopBottom, ChatContentBiger);
-    } else {
-        self.btnContent.isMyMessage = NO;
-        [self.btnContent setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
-        self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentBiger, ChatContentTopBottom, ChatContentSmaller);
+
+    [self configureDateLabelWithFrame:messageFrame message:message];
+    [self configureAvatarFrameWithFrame:messageFrame message:message];
+    [self configureNameLabelWithFrame:messageFrame message:message];
+    [self configureContentWithFrame:messageFrame message:message];
+}
+
+- (void)configureAvatarForMessage:(UUMessage *)message
+{
+    [self cancelAvatarLoading];
+
+    if (message.avatarImage) {
+        [self applyAvatarImage:message.avatarImage];
+        return;
     }
-    
-    //背景气泡图
-    UIImage *normal;
-    if (message.from == UUMessageFromMe) {
-        normal = [UIImage uu_imageWithName:@"chatto_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 10, 10, 22)];
-    }
-    else{
-        normal = [UIImage uu_imageWithName:@"chatfrom_bg_normal"];
-        normal = [normal resizableImageWithCapInsets:UIEdgeInsetsMake(35, 22, 10, 10)];
-    }
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateNormal];
-    [self.btnContent setBackgroundImage:normal forState:UIControlStateHighlighted];
-	
-    switch (message.type) {
-        case UUMessageTypeText:
-            [self.btnContent setTitle:message.strContent forState:UIControlStateNormal];
-            break;
-        case UUMessageTypePicture:
-        {
-            self.btnContent.backImageView.hidden = NO;
-            self.btnContent.backImageView.image = message.picture;
-            self.btnContent.backImageView.frame = CGRectMake(0, 0, self.btnContent.frame.size.width, self.btnContent.frame.size.height);
-            [self makeMaskView:self.btnContent.backImageView withImage:normal];
+
+    NSString *identifier = message.avatarIdentifier ?: @"";
+    if (identifier.length > 0) {
+        UIImage *localImage = [UIImage imageNamed:identifier];
+        if (localImage) {
+            [self applyAvatarImage:localImage];
+            return;
         }
+
+        NSURL *url = [NSURL URLWithString:identifier];
+        if (url.scheme.length > 0) {
+            [self applyPlaceholderAvatarWithName:message.displayName];
+            [self loadRemoteAvatarWithURL:url identifier:identifier];
+            return;
+        }
+    }
+
+    [self applyPlaceholderAvatarWithName:message.displayName];
+}
+
+- (void)loadRemoteAvatarWithURL:(NSURL *)url identifier:(NSString *)identifier
+{
+    UIImage *cachedImage = [[[self class] avatarImageCache] objectForKey:identifier];
+    if (cachedImage) {
+        [self applyAvatarImage:cachedImage];
+        return;
+    }
+
+    self.representedAvatarIdentifier = identifier;
+    __weak typeof(self) weakSelf = self;
+    self.avatarTask = [[NSURLSession sharedSession] dataTaskWithURL:url
+                                                  completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error || data.length == 0) {
+            return;
+        }
+
+        UIImage *image = [UIImage imageWithData:data];
+        if (!image) {
+            return;
+        }
+
+        [[[weakSelf class] avatarImageCache] setObject:image forKey:identifier];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (![weakSelf.representedAvatarIdentifier isEqualToString:identifier]) {
+                return;
+            }
+
+            [weakSelf applyAvatarImage:image];
+        });
+    }];
+    [self.avatarTask resume];
+}
+
+- (void)toggleVoicePlayback
+{
+    if (self.voiceData.length == 0) {
+        return;
+    }
+
+    if (self.isContentVoicePlaying) {
+        [self stopVoicePlaybackIfNeeded];
+        return;
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:UUVoicePlayHasInterruptNotification object:nil];
+    self.contentVoicePlaying = YES;
+    self.audioPlayer.delegate = self;
+    [self.audioPlayer playAudioData:self.voiceData];
+}
+
+- (void)showPicturePreview
+{
+    [UUImageAvatarBrowser showImage:self.btnContent.backImageView];
+    if ([self.delegate isKindOfClass:[UIViewController class]]) {
+        [[(UIViewController *)self.delegate view] endEditing:YES];
+    }
+}
+
+- (void)showCopyMenu
+{
+    [self.btnContent becomeFirstResponder];
+    UIMenuController *menuController = UIMenuController.sharedMenuController;
+    [menuController showMenuFromView:self.btnContent.superview rect:self.btnContent.frame];
+}
+
+- (void)configureDateLabelWithFrame:(UUMessageFrame *)messageFrame message:(UUMessage *)message
+{
+    self.dateLabel.text = message.displayTimeText;
+    self.dateLabel.frame = messageFrame.timeF;
+    self.dateLabel.hidden = CGRectEqualToRect(messageFrame.timeF, CGRectZero);
+}
+
+- (void)configureAvatarFrameWithFrame:(UUMessageFrame *)messageFrame message:(UUMessage *)message
+{
+    self.headImageButton.frame = messageFrame.iconF;
+    self.headImageButton.hidden = CGRectEqualToRect(messageFrame.iconF, CGRectZero);
+    if (!self.headImageButton.hidden) {
+        [self configureAvatarForMessage:message];
+    }
+}
+
+- (void)configureNameLabelWithFrame:(UUMessageFrame *)messageFrame message:(UUMessage *)message
+{
+    self.nameLabel.text = message.displayName.uppercaseString;
+    self.nameLabel.frame = messageFrame.nameF;
+    self.nameLabel.hidden = message.sender == UUMessageFromMe || CGRectEqualToRect(messageFrame.nameF, CGRectZero);
+    self.nameLabel.textAlignment = NSTextAlignmentLeft;
+}
+
+- (void)configureContentWithFrame:(UUMessageFrame *)messageFrame message:(UUMessage *)message
+{
+    [self resetContentState];
+
+    self.btnContent.frame = messageFrame.contentF;
+    self.btnContent.isMyMessage = message.sender == UUMessageFromMe;
+    [self.btnContent setTitleColor:message.sender == UUMessageFromMe ? UIColor.whiteColor : [UIColor colorWithRed:0.12 green:0.16 blue:0.23 alpha:1.0]
+                       forState:UIControlStateNormal];
+    self.btnContent.titleLabel.textAlignment = NSTextAlignmentLeft;
+    self.btnContent.titleEdgeInsets = UIEdgeInsetsMake(ChatContentTopBottom, ChatContentBiger, ChatContentTopBottom, ChatContentSmaller);
+
+    switch (message.contentType) {
+        case UUMessageTypePicture:
+            [self configurePictureContentWithMessage:message];
             break;
         case UUMessageTypeVoice:
-        {
-            self.btnContent.voiceBackView.hidden = NO;
-            self.btnContent.second.text = [NSString stringWithFormat:@"%@'s Voice",message.strVoiceTime];
-            _songData = message.voice;
-//            _voiceURL = [NSString stringWithFormat:@"%@%@",RESOURCE_URL_HOST,message.strVoice];
-        }
+            [self configureVoiceContentWithMessage:message];
             break;
-            
+        case UUMessageTypeText:
         default:
+            [self configureTextContentWithMessage:message];
             break;
     }
 }
 
-- (void)makeMaskView:(UIView *)view withImage:(UIImage *)image
+- (void)configureTextContentWithMessage:(UUMessage *)message
 {
-    UIImageView *imageViewMask = [[UIImageView alloc] initWithImage:image];
-    imageViewMask.frame = CGRectInset(view.frame, 0.0f, 0.0f);
-    view.layer.mask = imageViewMask.layer;
+    [self.btnContent setTitle:message.text ?: @"" forState:UIControlStateNormal];
 }
 
-//处理监听触发事件
--(void)sensorStateChange:(NSNotificationCenter *)notification;
+- (void)configurePictureContentWithMessage:(UUMessage *)message
 {
-    if ([[UIDevice currentDevice] proximityState] == YES){
-        NSLog(@"Device is close to user");
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    self.btnContent.backImageView.hidden = NO;
+    self.btnContent.backImageView.image = message.image;
+}
+
+- (void)configureVoiceContentWithMessage:(UUMessage *)message
+{
+    self.btnContent.voiceBackView.hidden = NO;
+    self.btnContent.second.text = [NSString stringWithFormat:@"%@s", message.voiceDurationText ?: @"1"];
+    self.voiceData = message.voiceData;
+}
+
+- (void)resetContentState
+{
+    self.contentVoicePlaying = NO;
+    self.voiceData = nil;
+    [self.btnContent stopPlay];
+    [self.btnContent setTitle:@"" forState:UIControlStateNormal];
+    self.btnContent.backImageView.hidden = YES;
+    self.btnContent.backImageView.image = nil;
+    self.btnContent.voiceBackView.hidden = YES;
+    self.btnContent.second.text = nil;
+}
+
+- (void)stopVoicePlaybackIfNeeded
+{
+    if (self.isContentVoicePlaying) {
+        [self.audioPlayer stopPlayback];
     }
-    else{
-        NSLog(@"Device is not close to user");
+    [[UIDevice currentDevice] setProximityMonitoringEnabled:NO];
+    self.contentVoicePlaying = NO;
+    [self.btnContent stopPlay];
+}
+
+- (void)cancelAvatarLoading
+{
+    [self.avatarTask cancel];
+    self.avatarTask = nil;
+    self.representedAvatarIdentifier = nil;
+}
+
+- (void)resetAvatarView
+{
+    [self.headImageButton setBackgroundImage:nil forState:UIControlStateNormal];
+    [self.headImageButton setTitle:nil forState:UIControlStateNormal];
+    self.headImageButton.backgroundColor = UIColor.clearColor;
+    self.headImageButton.hidden = NO;
+}
+
+- (void)applyAvatarImage:(UIImage *)image
+{
+    self.representedAvatarIdentifier = nil;
+    [self.headImageButton setBackgroundImage:image forState:UIControlStateNormal];
+    [self.headImageButton setTitle:nil forState:UIControlStateNormal];
+    self.headImageButton.backgroundColor = UIColor.clearColor;
+}
+
+- (void)applyPlaceholderAvatarWithName:(NSString *)name
+{
+    NSString *displayName = name.length > 0 ? name : @"U";
+    NSString *firstCharacter = [[displayName substringToIndex:1] uppercaseString];
+    [self.headImageButton setBackgroundImage:nil forState:UIControlStateNormal];
+    [self.headImageButton setTitle:firstCharacter forState:UIControlStateNormal];
+    self.headImageButton.backgroundColor = [self avatarColorForSeed:displayName];
+}
+
+- (UIColor *)avatarColorForSeed:(NSString *)seed
+{
+    NSArray<UIColor *> *colors = @[
+        [UIColor colorWithRed:0.98 green:0.47 blue:0.35 alpha:1.0],
+        [UIColor colorWithRed:0.20 green:0.66 blue:0.86 alpha:1.0],
+        [UIColor colorWithRed:0.44 green:0.72 blue:0.40 alpha:1.0],
+        [UIColor colorWithRed:0.57 green:0.45 blue:0.85 alpha:1.0],
+        [UIColor colorWithRed:0.96 green:0.68 blue:0.22 alpha:1.0]
+    ];
+    return colors[seed.hash % colors.count];
+}
+
+- (void)sensorStateChange:(NSNotification *)notification
+{
+    (void)notification;
+    if ([[UIDevice currentDevice] proximityState] == YES) {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    } else {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     }
 }
 
 @end
-
-
-
